@@ -20,12 +20,12 @@
             历史数据查询
           </v-card-title>
           <v-card-text>
-            <v-alert type="info" class="mb-4">
+            <!-- <v-alert type="info" class="mb-4">
               数据回溯功能正在开发中...
-            </v-alert>
+            </v-alert> -->
             
             <v-row class="mb-4">
-              <v-col cols="12" md="3">
+              <v-col cols="12" md="2">
                 <v-text-field
                   label="选手姓名"
                   variant="outlined"
@@ -33,7 +33,7 @@
                   hide-details
                 ></v-text-field>
               </v-col>
-              <v-col cols="12" md="3">
+              <v-col cols="12" md="2">
                 <v-select
                   label="比赛项目"
                   :items="['全部项目', '太极拳', '长拳', '南拳']"
@@ -42,7 +42,7 @@
                   hide-details
                 ></v-select>
               </v-col>
-              <v-col cols="12" md="3">
+              <v-col cols="12" md="2">
                 <v-text-field
                   label="开始日期"
                   type="date"
@@ -51,7 +51,7 @@
                   hide-details
                 ></v-text-field>
               </v-col>
-              <v-col cols="12" md="3">
+              <v-col cols="12" md="2">
                 <v-text-field
                   label="结束日期"
                   type="date"
@@ -59,6 +59,25 @@
                   density="compact"
                   hide-details
                 ></v-text-field>
+              </v-col>
+              <v-col cols="12" md="4" class="d-flex align-end">
+                <v-btn
+                  color="#42b883"
+                  prepend-icon="mdi-magnify"
+                  @click="handleQuery"
+                  class="mr-2"
+                  height="40"
+                >
+                  查询
+                </v-btn>
+                <v-btn
+                  color="grey"
+                  prepend-icon="mdi-restore"
+                  @click="handleReset"
+                  height="40"
+                >
+                  重置
+                </v-btn>
               </v-col>
             </v-row>
 
@@ -88,6 +107,16 @@
 
 <script setup>
 import { ref } from 'vue'
+
+const handleQuery = () => {
+  // 这里可以添加实际的查询逻辑
+  console.log('执行查询...')
+}
+
+const handleReset = () => {
+  // 重置查询条件
+  console.log('重置查询条件...')
+}
 
 // 表格头
 const headers = [

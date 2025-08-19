@@ -20,9 +20,9 @@
             报告生成
           </v-card-title>
           <v-card-text>
-            <v-alert type="info" class="mb-4">
+            <!-- <v-alert type="info" class="mb-4">
               报告生成功能正在开发中...
-            </v-alert>
+            </v-alert> -->
             
             <v-row>
               <v-col cols="12" md="6">
@@ -69,13 +69,13 @@
               
               <v-col cols="12" md="6">
                 <v-card class="report-preview">
-                  <v-card-title>报告预览</v-card-title>
+                  <!-- <v-card-title>报告预览</v-card-title>
                   <v-card-text>
                     <v-icon size="64" color="grey" class="d-block mx-auto mb-4">
                       mdi-file-pdf-outline
                     </v-icon>
                     <p class="text-center">PDF预览将在此显示</p>
-                  </v-card-text>
+                  </v-card-text> -->
                 </v-card>
               </v-col>
             </v-row>
@@ -92,11 +92,11 @@
           <v-card-text>
             <v-list>
               <v-list-item>
-                <v-list-item-title>日报告 - 2024-01-15</v-list-item-title>
+                <v-list-item-title>日报告 - 2025-08-19</v-list-item-title>
                 <v-list-item-subtitle>2.1 MB - 下载</v-list-item-subtitle>
               </v-list-item>
               <v-list-item>
-                <v-list-item-title>周报告 - 2024-01-08~14</v-list-item-title>
+                <v-list-item-title>周报告 - 2025-08-19</v-list-item-title>
                 <v-list-item-subtitle>5.3 MB - 下载</v-list-item-subtitle>
               </v-list-item>
               <v-list-item>

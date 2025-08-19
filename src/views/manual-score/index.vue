@@ -20,9 +20,9 @@
             评分调整
           </v-card-title>
           <v-card-text>
-            <v-alert type="info" class="mb-4">
+            <!-- <v-alert type="info" class="mb-4">
               人工评分干预功能正在开发中...
-            </v-alert>
+            </v-alert> -->
             
             <v-row>
               <v-col cols="12" md="8">
@@ -77,6 +77,10 @@
                           ></v-textarea>
                         </v-col>
                       </v-row>
+                                            <v-btn color="#42b883" block>
+                        <v-icon left>mdi-file-pdf</v-icon>
+                        确定调整
+                      </v-btn>
                     </v-form>
                   </v-card-text>
                 </v-card>
@@ -96,9 +100,11 @@
                         <v-list-item-subtitle>7.8 → 8.0 (表现力度)</v-list-item-subtitle>
                       </v-list-item>
                     </v-list>
+                    
                   </v-card-text>
                 </v-card>
               </v-col>
+              
             </v-row>
           </v-card-text>
         </v-card>

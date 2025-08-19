@@ -20,9 +20,9 @@
             备份管理
           </v-card-title>
           <v-card-text>
-            <v-alert type="info" class="mb-4">
+            <!-- <v-alert type="info" class="mb-4">
               数据备份功能正在开发中...
-            </v-alert>
+            </v-alert> -->
             
             <v-row>
               <v-col cols="12" md="6">
@@ -32,7 +32,7 @@
                     <v-list>
                       <v-list-item>
                         <v-list-item-title>上次备份</v-list-item-title>
-                        <v-list-item-subtitle>2024-01-15 14:30</v-list-item-subtitle>
+                        <v-list-item-subtitle>2025-08-19 14:30</v-list-item-subtitle>
                       </v-list-item>
                       <v-list-item>
                         <v-list-item-title>备份大小</v-list-item-title>
@@ -82,15 +82,15 @@
           <v-card-text>
             <v-list>
               <v-list-item>
-                <v-list-item-title>2024-01-15 14:30</v-list-item-title>
+                <v-list-item-title>2025-08-19 14:30</v-list-item-title>
                 <v-list-item-subtitle>自动备份 - 2.3 GB</v-list-item-subtitle>
               </v-list-item>
               <v-list-item>
-                <v-list-item-title>2024-01-14 14:30</v-list-item-title>
+                <v-list-item-title>2025-08-18 14:30</v-list-item-title>
                 <v-list-item-subtitle>自动备份 - 2.2 GB</v-list-item-subtitle>
               </v-list-item>
               <v-list-item>
-                <v-list-item-title>2024-01-13 14:30</v-list-item-title>
+                <v-list-item-title>2025-08-17 14:30</v-list-item-title>
                 <v-list-item-subtitle>手动备份 - 2.1 GB</v-list-item-subtitle>
               </v-list-item>
             </v-list>
