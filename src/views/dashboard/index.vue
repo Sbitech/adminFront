@@ -1,16 +1,5 @@
 <template>
   <v-container fluid class="dashboard-container">
-    <v-row>
-      <v-col cols="12">
-        <div class="dashboard-header">
-          <h1 class="dashboard-title">
-            <v-icon left color="#42b883">mdi-view-dashboard</v-icon>
-            裁判工作台
-          </h1>
-          <p class="dashboard-subtitle">武术评分系统总览</p>
-        </div>
-      </v-col>
-    </v-row>
 
     <v-row>
       <v-col cols="12" md="3">
@@ -173,7 +162,7 @@
 .dashboard-container {
   background-color: #f0f2f5;
   background-image: linear-gradient(135deg, #f0f2f5 0%, #e4e7ed 100%);
-  min-height: 100vh;
+  min-height: auto;
   padding: 20px;
 }
 

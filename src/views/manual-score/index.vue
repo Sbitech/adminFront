@@ -1,16 +1,5 @@
 <template>
   <v-container fluid class="manual-score-container">
-    <v-row>
-      <v-col cols="12">
-        <div class="manual-score-header">
-          <h1 class="manual-score-title">
-            <v-icon left color="#42b883">mdi-account-edit</v-icon>
-            人工评分干预
-          </h1>
-          <p class="manual-score-subtitle">手动调整AI评分结果</p>
-        </div>
-      </v-col>
-    </v-row>
 
     <v-row>
       <v-col cols="12">
@@ -121,7 +110,7 @@
 .manual-score-container {
   background-color: #f0f2f5;
   background-image: linear-gradient(135deg, #f0f2f5 0%, #e4e7ed 100%);
-  min-height: 100vh;
+  min-height: auto;
   padding: 20px;
 }
 

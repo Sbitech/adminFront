@@ -1,16 +1,5 @@
 <template>
   <v-container fluid class="backup-container">
-    <v-row>
-      <v-col cols="12">
-        <div class="backup-header">
-          <h1 class="backup-title">
-            <v-icon left color="#42b883">mdi-database</v-icon>
-            数据备份
-          </h1>
-          <p class="backup-subtitle">管理和备份评分数据</p>
-        </div>
-      </v-col>
-    </v-row>
 
     <v-row>
       <v-col cols="12" md="8">
@@ -109,7 +98,7 @@
 .backup-container {
   background-color: #f0f2f5;
   background-image: linear-gradient(135deg, #f0f2f5 0%, #e4e7ed 100%);
-  min-height: 100vh;
+  min-height: auto;
   padding: 20px;
 }
 

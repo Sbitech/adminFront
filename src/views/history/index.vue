@@ -1,16 +1,5 @@
 <template>
   <v-container fluid class="history-container">
-    <v-row>
-      <v-col cols="12">
-        <div class="history-header">
-          <h1 class="history-title">
-            <v-icon left color="#42b883">mdi-history</v-icon>
-            数据回溯
-          </h1>
-          <p class="history-subtitle">查看历史评分数据</p>
-        </div>
-      </v-col>
-    </v-row>
 
     <v-row>
       <v-col cols="12">
@@ -162,7 +151,7 @@ const historyData = ref([
 .history-container {
   background-color: #f0f2f5;
   background-image: linear-gradient(135deg, #f0f2f5 0%, #e4e7ed 100%);
-  min-height: 100vh;
+  min-height: auto;
   padding: 20px;
 }
 

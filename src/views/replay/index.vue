@@ -1,16 +1,5 @@
 <template>
   <v-container fluid class="replay-container">
-    <v-row>
-      <v-col cols="12">
-        <div class="replay-header">
-          <h1 class="replay-title">
-            <v-icon left color="#42b883">mdi-play-box-multiple</v-icon>
-            实时回放
-          </h1>
-          <p class="replay-subtitle">观看比赛实时回放</p>
-        </div>
-      </v-col>
-    </v-row>
 
     <v-row>
       <v-col cols="12">
@@ -77,8 +66,8 @@
             </v-row>
 
             <v-row>
-              <v-col cols="12" md="8">
-                <v-card class="video-player" height="400">
+              <v-col cols="12" lg="8">
+                <v-card class="video-player" style="aspect-ratio: 16/8; max-height: 600px;">
                   <video
                     v-if="selectedMatch && selectedMatch.videoUrl"
                     :src="selectedMatch.videoUrl"
@@ -97,33 +86,36 @@
                 </v-card>
               </v-col>
               
-              <v-col cols="12" md="4">
-                <v-card class="match-list">
-                  <v-card-title>
+              <v-col cols="12" lg="4">
+                <v-card class="match-list" max-height="600" style="overflow-y: auto;">
+                  <v-card-title class="sticky-title">
                     比赛场次
                     <v-chip v-if="filteredMatches.length !== matches.length" small color="#42b883" class="ml-2">
                       {{ filteredMatches.length }} 场
                     </v-chip>
                   </v-card-title>
-                  <v-card-text>
-                    <v-list>
+                  <v-card-text class="pa-0">
+                    <v-list density="compact" style="max-height: 520px; overflow-y: auto;">
                       <v-list-item
-                        v-for="match in filteredMatches"
+                        v-for="(match, index) in filteredMatches"
                         :key="match.id"
                         :class="{ 'selected-match': selectedMatch?.id === match.id }"
                         @click="selectMatch(match)"
                         class="match-item"
+                        :style="{ borderTop: index === 0 ? 'none' : '1px solid #f0f0f0' }"
                       >
-                        <v-list-item-title>{{ match.title }}</v-list-item-title>
-                        <v-list-item-subtitle>{{ match.event }} - {{ match.date }} {{ match.time }}</v-list-item-subtitle>
+                        <v-list-item-title class="text-body-2 font-weight-medium">{{ match.title }}</v-list-item-title>
+                        <v-list-item-subtitle class="text-caption">
+                          {{ match.event }} • {{ match.date }} {{ match.time }}
+                        </v-list-item-subtitle>
                         <template v-slot:append>
-                          <v-icon v-if="selectedMatch?.id === match.id" color="#42b883">
+                          <v-icon v-if="selectedMatch?.id === match.id" color="#42b883" size="20">
                             mdi-play-circle
                           </v-icon>
                         </template>
                       </v-list-item>
-                      <v-list-item v-if="filteredMatches.length === 0">
-                        <v-list-item-title class="text-center text-grey">
+                      <v-list-item v-if="filteredMatches.length === 0" class="text-center py-4">
+                        <v-list-item-title class="text-grey text-body-2">
                           暂无匹配的比赛
                         </v-list-item-title>
                       </v-list-item>
@@ -204,7 +196,88 @@ const matches = ref([
     player1: '吴一',
     player2: '郑二',
     videoUrl: '/videos/match005.mp4'
-  }
+  },
+  {
+    id: 6,
+    title: '场次 006 - 王二 vs 张三',
+    event: '刀术',
+    time: '15:00',
+    date: '2024-01-16',
+    player1: '王二',
+    player2: '张三',
+    videoUrl: '/videos/match006.mp4'
+  },
+  {
+    id: 7,
+    title: '场次 007 - 李四 vs 王五',
+    event: '太极拳',
+    time: '15:30',
+    date: '2024-01-16',
+    player1: '李四',
+    player2: '王五',
+    videoUrl: '/videos/match007.mp4'
+  },
+  {
+    id: 8,
+    title: '场次 008 - 赵六 vs 孙七',
+    event: '长拳',
+    time: '16:00',
+    date: '2024-01-16',
+    player1: '赵六',
+    player2: '孙七',
+    videoUrl: '/videos/match008.mp4'
+  },
+  {
+    id: 9,
+    title: '场次 009 - 周八 vs 吴九',
+    event: '南拳',
+    time: '16:30',
+    date: '2024-01-16',
+    player1: '周八',
+    player2: '吴九',
+    videoUrl: '/videos/match009.mp4'
+  },
+  {
+    id: 10,
+    title: '场次 010 - 郑十 vs 王十一',
+    event: '剑术',
+    time: '17:00',
+    date: '2024-01-16',
+    player1: '郑十',
+    player2: '王十一',
+    videoUrl: '/videos/match010.mp4'
+  },
+  {
+    id: 11,
+    title: '场次 011 - 王十二 vs 郑十三',
+    event: '刀术',
+    time: '17:30',
+    date: '2024-01-16',
+    player1: '王十二',
+    player2: '郑十三',
+    videoUrl: '/videos/match011.mp4'
+  },
+  {
+    id: 12,
+    title: '场次 012 - 王十三 vs 郑十四',
+    event: '刀术',
+    time: '18:00',
+    date: '2024-01-16',
+    player1: '王十三',
+    player2: '郑十四',
+    videoUrl: '/videos/match012.mp4'
+  },
+  {
+    id: 13,
+    title: '场次 013 - 王十四 vs 郑十五',
+    event: '刀术',
+    time: '18:30',
+    date: '2024-01-16',
+    player1: '王十四',
+    player2: '郑十五',
+    videoUrl: '/videos/match013.mp4'
+  },
+  
 ])
 
 // 筛选后的比赛列表
@@ -270,7 +343,7 @@ const handleVideoError = () => {
 .replay-container {
   background-color: #f0f2f5;
   background-image: linear-gradient(135deg, #f0f2f5 0%, #e4e7ed 100%);
-  min-height: 100vh;
+  min-height: auto;
   padding: 20px;
 }
 
@@ -307,11 +380,23 @@ const handleVideoError = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f5f5f5;
+  background-color: #000;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .match-list {
   border-radius: 8px;
+  position: relative;
+}
+
+.sticky-title {
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 1;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .video-element {

@@ -1,16 +1,5 @@
 <template>
   <v-container fluid class="ai-score-container">
-    <v-row>
-      <v-col cols="12">
-        <div class="ai-score-header">
-          <h1 class="ai-score-title">
-            <v-icon left color="#42b883">mdi-robot</v-icon>
-            AI评分明细
-          </h1>
-          <p class="ai-score-subtitle">查看AI评分详细分析</p>
-        </div>
-      </v-col>
-    </v-row>
 
     <v-row>
       <v-col cols="12">
@@ -94,7 +83,7 @@
 .ai-score-container {
   background-color: #f0f2f5;
   background-image: linear-gradient(135deg, #f0f2f5 0%, #e4e7ed 100%);
-  min-height: 100vh;
+  min-height: auto;
   padding: 20px;
 }
 

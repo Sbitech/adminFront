@@ -1,16 +1,5 @@
 <template>
   <v-container fluid class="report-container">
-    <v-row>
-      <v-col cols="12">
-        <div class="report-header">
-          <h1 class="report-title">
-            <v-icon left color="#42b883">mdi-file-pdf-box</v-icon>
-            报告PDF
-          </h1>
-          <p class="report-subtitle">生成和管理评分报告</p>
-        </div>
-      </v-col>
-    </v-row>
 
     <v-row>
       <v-col cols="12" lg="8">
@@ -357,7 +346,7 @@ reportForm.value.endDate = today
 .report-container {
   background-color: #f0f2f5;
   background-image: linear-gradient(135deg, #f0f2f5 0%, #e4e7ed 100%);
-  min-height: 100vh;
+  min-height: auto;
   padding: 20px;
 }
 
@@ -367,8 +356,8 @@ reportForm.value.endDate = today
 }
 
 .report-title {
-  font-size: 2.5rem;
-  font-weight: 700;
+  font-size: 2rem;
+  font-weight: 600;
   color: #2c3e50;
   margin-bottom: 8px;
 }
@@ -391,12 +380,6 @@ reportForm.value.endDate = today
   background: #f8f9fa;
   border-radius: 8px;
 }
-
-
-
-
-
-
 
 .report-item {
   border-bottom: 1px solid #f0f0f0;
