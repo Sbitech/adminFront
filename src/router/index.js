@@ -59,6 +59,11 @@ const router = createRouter({
           path: 'history',
           name: 'history',
           component: () => import('../views/history/index.vue')
+        },
+        {
+          path: 'notification',
+          name: 'notification',
+          component: () => import('../views/notification/index.vue')
         }
       ]
     }

@@ -175,13 +175,8 @@ const historyData = ref([
 .history-card {
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s, box-shadow 0.3s;
   border: none;
-}
-
-.history-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+  /* 移除hover效果 */
 }
 
 .history-table {

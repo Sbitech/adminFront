@@ -86,6 +86,13 @@
           to="/dispute"
           exact
         ></v-list-item>
+        <v-list-item 
+          prepend-icon="mdi-bell" 
+          title="消息通知" 
+          value="notification" 
+          to="/notification"
+          exact
+        ></v-list-item>
       </v-list>
 
       <template v-slot:append>
@@ -300,7 +307,8 @@ const handleNotificationClick = (notification) => {
 }
 
 const viewAllNotifications = () => {
-  router.push('/notifications')
+  router.push('/notification')
+  notificationMenu.value = false
 }
 
 const drawer = ref(true)
