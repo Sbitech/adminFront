@@ -4,7 +4,8 @@
     <v-row>
       <v-col cols="12">
         <v-card class="dispute-card">
-          <v-card-title class="dispute-title">
+          <v-card-title>
+            <v-icon left>mdi-file-document-edit</v-icon>
             争议复核管理
           </v-card-title>
           
@@ -97,11 +98,11 @@
     <!-- 争议详情对话框 -->
     <v-dialog v-model="detailDialog" max-width="900px" persistent>
       <v-card class="dispute-detail-card">
-        <v-card-title class="dispute-detail-title d-flex align-center">
-          <v-icon left>mdi-file-document-edit</v-icon>
-          <span>争议案件详情</span>
+        <v-card-title class="d-flex align-center" style="background-color: #42b883; color: white;">
+          <v-icon left class="mr-2">mdi-file-document-edit</v-icon>
+          <span class="text-h5">争议案件详情</span>
           <v-spacer></v-spacer>
-          <v-btn icon @click="closeDetailDialog" class="ml-2">
+          <v-btn icon @click="closeDetailDialog" class="ml-2" style="color: white;">
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-card-title>
@@ -448,18 +449,6 @@ const refreshData = () => {
   margin-bottom: 30px;
 }
 
-.dispute-title {
-  color: #2c3e50;
-  font-weight: 600;
-  font-size: 2rem;
-  margin-bottom: 8px;
-}
-
-.dispute-subtitle {
-  color: #666;
-  font-size: 1.1rem;
-}
-
 .dispute-card {
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
@@ -475,12 +464,6 @@ const refreshData = () => {
 .dispute-detail-card {
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-}
-
-.dispute-detail-title {
-  background-color: #42b883;
-  color: white;
-  font-weight: 600;
 }
 
 .detail-section {
