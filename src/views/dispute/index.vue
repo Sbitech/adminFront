@@ -102,7 +102,7 @@
           <v-icon left class="mr-2">mdi-file-document-edit</v-icon>
           <span class="text-h5">争议案件详情</span>
           <v-spacer></v-spacer>
-          <v-btn icon @click="closeDetailDialog" class="ml-2" style="color: white;">
+          <v-btn icon @click="closeDetailDialog" class="ml-2" style="background-color: rgba(255,255,255,0.1); color: white;" elevation="0">
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-card-title>

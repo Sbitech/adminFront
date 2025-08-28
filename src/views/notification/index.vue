@@ -9,28 +9,28 @@
     <!-- 统计卡片 -->
     <v-row class="mb-4">
       <v-col cols="12" sm="6" md="3">
-        <v-card class="text-center pa-4" elevation="2">
+        <v-card class="text-center pa-4 stat-card">
           <v-icon size="48" color="primary" class="mb-2">mdi-bell</v-icon>
           <div class="text-h4">{{ totalCount }}</div>
           <div>总通知</div>
         </v-card>
       </v-col>
       <v-col cols="12" sm="6" md="3">
-        <v-card class="text-center pa-4" elevation="2">
+        <v-card class="text-center pa-4 stat-card">
           <v-icon size="48" color="warning" class="mb-2">mdi-bell-alert</v-icon>
           <div class="text-h4">{{ unreadCount }}</div>
           <div>未读通知</div>
         </v-card>
       </v-col>
       <v-col cols="12" sm="6" md="3">
-        <v-card class="text-center pa-4" elevation="2">
+        <v-card class="text-center pa-4 stat-card">
           <v-icon size="48" color="success" class="mb-2">mdi-check-circle</v-icon>
           <div class="text-h4">{{ readCount }}</div>
           <div>已读通知</div>
         </v-card>
       </v-col>
       <v-col cols="12" sm="6" md="3">
-        <v-card class="text-center pa-4" elevation="2">
+        <v-card class="text-center pa-4 stat-card">
           <v-icon size="48" color="info" class="mb-2">mdi-clock</v-icon>
           <div class="text-h4">{{ todayCount }}</div>
           <div>今日通知</div>
@@ -218,6 +218,17 @@ export default {
     border-radius: 12px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     border: none;
+  }
+
+  /* 统计卡片悬浮效果 - 与首页保持一致 */
+  .stat-card {
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
   }
   
   .notification-item {
