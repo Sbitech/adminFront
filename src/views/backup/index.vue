@@ -12,7 +12,7 @@
             <!-- <v-alert type="info" class="mb-4">
               数据备份功能正在开发中...
             </v-alert> -->
-            
+
             <v-row>
               <v-col cols="12" md="6">
                 <v-card class="backup-status">
@@ -37,7 +37,7 @@
                   </v-card-text>
                 </v-card>
               </v-col>
-              
+
               <v-col cols="12" md="6">
                 <v-card class="backup-actions">
                   <v-card-title>备份操作</v-card-title>
@@ -61,7 +61,7 @@
           </v-card-text>
         </v-card>
       </v-col>
-      
+
       <v-col cols="12" md="4">
         <v-card class="backup-history">
           <v-card-title>
@@ -119,14 +119,15 @@
   font-size: 1.1rem;
 }
 
-.backup-card, .backup-card {
+.backup-card,
+.backup-card {
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   border: none;
-  /* 移除hover效果 */
 }
 
-.backup-status, .backup-actions {
+.backup-status,
+.backup-actions {
   border-radius: 8px;
 }
 </style>

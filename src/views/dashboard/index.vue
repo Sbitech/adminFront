@@ -13,7 +13,7 @@
           </v-card-text>
         </v-card>
       </v-col>
-      
+
       <v-col cols="12" md="3">
         <v-card class="judge-card" color="#3aa876" theme="dark">
           <v-card-text>
@@ -25,7 +25,7 @@
           </v-card-text>
         </v-card>
       </v-col>
-      
+
       <v-col cols="12" md="3">
         <v-card class="judge-card" color="#2c3e50" theme="dark">
           <v-card-text>
@@ -37,7 +37,7 @@
           </v-card-text>
         </v-card>
       </v-col>
-      
+
       <v-col cols="12" md="3">
         <v-card class="judge-card" color="#34495e" theme="dark">
           <v-card-text>
@@ -106,7 +106,7 @@
           </v-card-text>
         </v-card>
       </v-col>
-      
+
       <v-col cols="12" lg="4">
         <v-card class="judge-card">
           <v-card-title>
@@ -122,7 +122,7 @@
                 <v-list-item-title>实时回放</v-list-item-title>
                 <v-list-item-subtitle>观看比赛回放</v-list-item-subtitle>
               </v-list-item>
-              
+
               <v-list-item @click="$router.push('/ai-score')" class="judge-list-item">
                 <template v-slot:prepend>
                   <v-icon color="#3aa876">mdi-robot</v-icon>
@@ -130,7 +130,7 @@
                 <v-list-item-title>AI评分明细</v-list-item-title>
                 <v-list-item-subtitle>查看AI评分详情</v-list-item-subtitle>
               </v-list-item>
-              
+
               <v-list-item @click="$router.push('/manual-score')" class="judge-list-item">
                 <template v-slot:prepend>
                   <v-icon color="#2c3e50">mdi-account-edit</v-icon>
@@ -138,7 +138,7 @@
                 <v-list-item-title>人工评分</v-list-item-title>
                 <v-list-item-subtitle>手动调整分数</v-list-item-subtitle>
               </v-list-item>
-              
+
               <v-list-item @click="$router.push('/report')" class="judge-list-item">
                 <template v-slot:prepend>
                   <v-icon color="#34495e">mdi-file-pdf-box</v-icon>

@@ -12,7 +12,7 @@
             <!-- <v-alert type="info" class="mb-4">
               AI评分明细功能正在开发中...
             </v-alert> -->
-            
+
             <v-row>
               <v-col cols="12" md="6">
                 <v-card class="score-summary">
@@ -35,7 +35,7 @@
                   </v-card-text>
                 </v-card>
               </v-col>
-              
+
               <v-col cols="12" md="6">
                 <v-card class="recent-scores">
                   <v-card-title>最近评分</v-card-title>
@@ -111,7 +111,8 @@
   /* 移除hover效果 */
 }
 
-.score-summary, .recent-scores {
+.score-summary,
+.recent-scores {
   border-radius: 8px;
 }
 </style>
