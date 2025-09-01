@@ -94,73 +94,7 @@
                 </v-card>
               </v-col>
 
-              <!-- 详细评分过程 -->
-              <v-col cols="12">
-                <v-card variant="outlined" class="info-card">
-                  <v-card-title class="text-subtitle-1 font-weight-bold">
-                    <v-icon left>mdi-chart-line</v-icon>
-                    评分过程分析
-                  </v-card-title>
-                  <v-card-text>
-                    <v-row>
-                      <v-col cols="12" md="8">
-                        <v-timeline density="compact">
-                          <v-timeline-item
-                            dot-color="blue"
-                            size="small"
-                          >
-                            <div class="d-flex justify-space-between align-center">
-                              <div>
-                                <strong>AI评分阶段</strong>
-                                <div class="text-caption">AI系统完成自动评分</div>
-                              </div>
-                              <v-chip size="small" color="blue">{{ detailData.aiScore }}分</v-chip>
-                            </div>
-                          </v-timeline-item>
-                          <v-timeline-item
-                            dot-color="green"
-                            size="small"
-                          >
-                            <div class="d-flex justify-space-between align-center">
-                              <div>
-                                <strong>人工复核阶段</strong>
-                                <div class="text-caption">裁判进行人工评分调整</div>
-                              </div>
-                              <v-chip size="small" color="green">{{ detailData.manualScore }}分</v-chip>
-                            </div>
-                          </v-timeline-item>
-                          <v-timeline-item
-                            dot-color="purple"
-                            size="small"
-                          >
-                            <div class="d-flex justify-space-between align-center">
-                              <div>
-                                <strong>最终确认</strong>
-                                <div class="text-caption">综合评分结果确认</div>
-                              </div>
-                              <v-chip size="small" color="purple">{{ detailData.finalScore }}分</v-chip>
-                            </div>
-                          </v-timeline-item>
-                        </v-timeline>
-                      </v-col>
-                      <v-col cols="12" md="4">
-                        <v-card class="stats-card" color="grey-lighten-4">
-                          <v-card-text>
-                            <div class="text-center">
-                              <v-icon size="48" color="grey">mdi-information</v-icon>
-                              <div class="text-h6 mt-2">评分说明</div>
-                              <div class="text-caption mt-2">
-                                最终评分为AI评分与人工评分的加权平均值，
-                                确保评分的客观性与准确性。
-                              </div>
-                            </div>
-                          </v-card-text>
-                        </v-card>
-                      </v-col>
-                    </v-row>
-                  </v-card-text>
-                </v-card>
-              </v-col>
+
 
               <!-- 操作记录 -->
               <v-col cols="12">

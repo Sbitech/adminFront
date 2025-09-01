@@ -58,6 +58,8 @@
                 </v-card>
               </v-col>
 
+
+
               <!-- 争议信息卡片 -->
               <v-col cols="12" md="6">
                 <v-card variant="outlined" class="info-card">
