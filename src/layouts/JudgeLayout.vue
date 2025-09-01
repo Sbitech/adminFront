@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <!-- 左侧响应式模块栏 -->
+
     <v-navigation-drawer
       v-model="drawer"
       :rail="rail && !isMobile"
@@ -16,19 +16,11 @@
         subtitle=""
         nav
       >
-        <!-- <template v-slot:append>
-          <v-btn
-            v-if="!isMobile"
-            variant="text"
-            :icon="rail ? 'mdi-chevron-right' : 'mdi-chevron-left'"
-            @click.stop="rail = !rail"
-          ></v-btn>
-        </template> -->
+
       </v-list-item>
 
       <v-divider></v-divider>
 
-      <!-- 功能模块导航 -->
       <v-list density="compact" nav>
         <v-list-item 
           prepend-icon="mdi-home" 
@@ -86,13 +78,7 @@
           to="/dispute"
           exact
         ></v-list-item>
-        <v-list-item 
-          prepend-icon="mdi-bell" 
-          title="消息通知" 
-          value="notification" 
-          to="/notification"
-          exact
-        ></v-list-item>
+        <!-- 消息通知导航项已删除，仅通过右上角铃铛图标进入 -->
       </v-list>
 
       <template v-slot:append>

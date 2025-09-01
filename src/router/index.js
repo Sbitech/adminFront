@@ -31,6 +31,11 @@ const router = createRouter({
           component: DisputeView
         },
         {
+          path: 'dispute/detail/:id',
+          name: 'dispute-detail',
+          component: () => import('../views/dispute/detail.vue')
+        },
+        {
           path: 'replay',
           name: 'replay',
           component: () => import('../views/replay/index.vue')
@@ -59,6 +64,11 @@ const router = createRouter({
           path: 'history',
           name: 'history',
           component: () => import('../views/history/index.vue')
+        },
+        {
+          path: 'history/detail/:id',
+          name: 'history-detail',
+          component: () => import('../views/history/detail.vue')
         },
         {
           path: 'notification',

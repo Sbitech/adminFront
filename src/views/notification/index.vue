@@ -6,7 +6,6 @@
       </v-col>
     </v-row>
 
-    <!-- 统计卡片 -->
     <v-row class="mb-4">
       <v-col cols="12" sm="6" md="3">
         <v-card class="text-center pa-4 stat-card">
@@ -38,7 +37,6 @@
       </v-col>
     </v-row>
 
-    <!-- 通知列表 -->
     <v-row>
       <v-col cols="12">
         <v-card>

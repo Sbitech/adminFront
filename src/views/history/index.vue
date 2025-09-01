@@ -9,9 +9,6 @@
             历史数据查询
           </v-card-title>
           <v-card-text>
-            <!-- <v-alert type="info" class="mb-4">
-              数据回溯功能正在开发中...
-            </v-alert> -->
             
             <v-row class="mb-4">
               <v-col cols="12" md="2">
@@ -81,6 +78,7 @@
                   color="#42b883"
                   small
                   variant="outlined"
+                  @click="viewDetail(item.id)"
                 >
                   <v-icon left small>mdi-eye</v-icon>
                   查看详情
@@ -96,6 +94,9 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const handleQuery = () => {
   // 这里可以添加实际的查询逻辑
@@ -105,6 +106,10 @@ const handleQuery = () => {
 const handleReset = () => {
   // 重置查询条件
   console.log('重置查询条件...')
+}
+
+const viewDetail = (id) => {
+  router.push(`/history/detail/${id}`)
 }
 
 // 表格头
@@ -121,6 +126,7 @@ const headers = [
 // 模拟历史数据
 const historyData = ref([
   {
+    id: 1,
     datetime: '2024-01-15 10:30',
     playerName: '张三',
     event: '太极拳',
@@ -129,6 +135,7 @@ const historyData = ref([
     finalScore: 8.4
   },
   {
+    id: 2,
     datetime: '2024-01-15 11:00',
     playerName: '李四',
     event: '长拳',
@@ -137,6 +144,7 @@ const historyData = ref([
     finalScore: 8.0
   },
   {
+    id: 3,
     datetime: '2024-01-15 11:30',
     playerName: '王五',
     event: '南拳',

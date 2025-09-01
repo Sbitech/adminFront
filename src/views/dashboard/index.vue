@@ -52,7 +52,7 @@
     </v-row>
 
     <v-row class="mt-4">
-      <v-col cols="12" lg="8">
+      <v-col cols="12">
         <v-card class="judge-card">
           <v-card-title>
             <v-icon left>mdi-play-circle</v-icon>
@@ -67,6 +67,7 @@
                   <th>项目</th>
                   <th>状态</th>
                   <th>AI评分</th>
+                  <th>开始时间</th>
                   <th>操作</th>
                 </tr>
               </thead>
@@ -77,6 +78,7 @@
                   <td>太极拳</td>
                   <td><v-chip color="green" small>进行中</v-chip></td>
                   <td>8.5</td>
+                  <td>10:30</td>
                   <td>
                     <v-btn color="primary" small>实时评分</v-btn>
                   </td>
@@ -87,6 +89,7 @@
                   <td>长拳</td>
                   <td><v-chip color="orange" small>待评分</v-chip></td>
                   <td>-</td>
+                  <td>10:45</td>
                   <td>
                     <v-btn color="success" small>开始评分</v-btn>
                   </td>
@@ -97,56 +100,35 @@
                   <td>南拳</td>
                   <td><v-chip color="red" small>争议中</v-chip></td>
                   <td>7.2</td>
+                  <td>09:15</td>
                   <td>
                     <v-btn color="warning" small>复核</v-btn>
                   </td>
                 </tr>
+                <tr>
+                  <td>004</td>
+                  <td>赵六</td>
+                  <td>剑术</td>
+                  <td><v-chip color="blue" small>已结束</v-chip></td>
+                  <td>8.8</td>
+                  <td>08:30</td>
+                  <td>
+                    <v-btn color="info" small>查看</v-btn>
+                  </td>
+                </tr>
+                <tr>
+                  <td>005</td>
+                  <td>钱七</td>
+                  <td>刀术</td>
+                  <td><v-chip color="green" small>进行中</v-chip></td>
+                  <td>7.9</td>
+                  <td>11:00</td>
+                  <td>
+                    <v-btn color="primary" small>实时评分</v-btn>
+                  </td>
+                </tr>
               </tbody>
             </v-table>
-          </v-card-text>
-        </v-card>
-      </v-col>
-
-      <v-col cols="12" lg="4">
-        <v-card class="judge-card">
-          <v-card-title>
-            <v-icon left>mdi-lightning-bolt</v-icon>
-            快捷评分工具
-          </v-card-title>
-          <v-card-text>
-            <v-list>
-              <v-list-item @click="$router.push('/replay')" class="judge-list-item">
-                <template v-slot:prepend>
-                  <v-icon color="#42b883">mdi-play-box-multiple</v-icon>
-                </template>
-                <v-list-item-title>实时回放</v-list-item-title>
-                <v-list-item-subtitle>观看比赛回放</v-list-item-subtitle>
-              </v-list-item>
-
-              <v-list-item @click="$router.push('/ai-score')" class="judge-list-item">
-                <template v-slot:prepend>
-                  <v-icon color="#3aa876">mdi-robot</v-icon>
-                </template>
-                <v-list-item-title>AI评分明细</v-list-item-title>
-                <v-list-item-subtitle>查看AI评分详情</v-list-item-subtitle>
-              </v-list-item>
-
-              <v-list-item @click="$router.push('/manual-score')" class="judge-list-item">
-                <template v-slot:prepend>
-                  <v-icon color="#2c3e50">mdi-account-edit</v-icon>
-                </template>
-                <v-list-item-title>人工评分</v-list-item-title>
-                <v-list-item-subtitle>手动调整分数</v-list-item-subtitle>
-              </v-list-item>
-
-              <v-list-item @click="$router.push('/report')" class="judge-list-item">
-                <template v-slot:prepend>
-                  <v-icon color="#34495e">mdi-file-pdf-box</v-icon>
-                </template>
-                <v-list-item-title>生成报告</v-list-item-title>
-                <v-list-item-subtitle>导出评分报告</v-list-item-subtitle>
-              </v-list-item>
-            </v-list>
           </v-card-text>
         </v-card>
       </v-col>

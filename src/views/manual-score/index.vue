@@ -9,9 +9,6 @@
             评分调整
           </v-card-title>
           <v-card-text>
-            <!-- <v-alert type="info" class="mb-4">
-              人工评分干预功能正在开发中...
-            </v-alert> -->
             
             <v-row>
               <v-col cols="12" md="8">

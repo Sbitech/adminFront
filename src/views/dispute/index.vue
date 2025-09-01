@@ -10,7 +10,6 @@
           </v-card-title>
           
           <v-card-text>
-            <!-- 搜索和筛选 -->
             <v-row class="mb-4">
               <v-col cols="12" md="4">
                 <v-text-field
@@ -83,7 +82,7 @@
                   color="#42b883"
                   small
                   variant="outlined"
-                  @click="openDisputeDetail(item)"
+                  @click="viewDisputeDetail(item.id)"
                 >
                   <v-icon left small>mdi-eye</v-icon>
                   查看详情
@@ -94,183 +93,19 @@
         </v-card>
       </v-col>
     </v-row>
-
-    <!-- 争议详情对话框 -->
-    <v-dialog v-model="detailDialog" max-width="900px" persistent>
-      <v-card class="dispute-detail-card">
-        <v-card-title class="d-flex align-center" style="background-color: #42b883; color: white;">
-          <v-icon left class="mr-2">mdi-file-document-edit</v-icon>
-          <span class="text-h5">争议案件详情</span>
-          <v-spacer></v-spacer>
-          <v-btn icon @click="closeDetailDialog" class="ml-2" style="background-color: rgba(255,255,255,0.1); color: white;" elevation="0">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-        </v-card-title>
-
-        <v-card-text>
-          <v-row>
-            <v-col cols="12" md="6">
-              <v-card class="detail-section">
-                <v-card-title class="section-title">基本信息</v-card-title>
-                <v-card-text>
-                  <v-list dense>
-                    <v-list-item>
-                      <v-list-item-title>案件编号</v-list-item-title>
-                      <v-list-item-subtitle>{{ selectedDispute.id }}</v-list-item-subtitle>
-                    </v-list-item>
-                    <v-list-item>
-                      <v-list-item-title>选手姓名</v-list-item-title>
-                      <v-list-item-subtitle>{{ selectedDispute.playerName }}</v-list-item-subtitle>
-                    </v-list-item>
-                    <v-list-item>
-                      <v-list-item-title>比赛项目</v-list-item-title>
-                      <v-list-item-subtitle>{{ selectedDispute.event }}</v-list-item-subtitle>
-                    </v-list-item>
-                    <v-list-item>
-                      <v-list-item-title>原始评分</v-list-item-title>
-                      <v-list-item-subtitle>{{ selectedDispute.originalScore }}</v-list-item-subtitle>
-                    </v-list-item>
-                  </v-list>
-                </v-card-text>
-              </v-card>
-            </v-col>
-            
-            <v-col cols="12" md="6">
-              <v-card class="detail-section">
-                <v-card-title class="section-title">争议信息</v-card-title>
-                <v-card-text>
-                  <v-list dense>
-                    <v-list-item>
-                      <v-list-item-title>争议类型</v-list-item-title>
-                      <v-list-item-subtitle>{{ selectedDispute.disputeType }}</v-list-item-subtitle>
-                    </v-list-item>
-                    <v-list-item>
-                      <v-list-item-title>提出时间</v-list-item-title>
-                      <v-list-item-subtitle>{{ selectedDispute.createdTime }}</v-list-item-subtitle>
-                    </v-list-item>
-                    <v-list-item>
-                      <v-list-item-title>争议理由</v-list-item-title>
-                      <v-list-item-subtitle>{{ selectedDispute.reason }}</v-list-item-subtitle>
-                    </v-list-item>
-                    <v-list-item>
-                      <v-list-item-title>当前状态</v-list-item-title>
-                      <v-list-item-subtitle>
-                        <v-chip small :color="getStatusColor(selectedDispute.status)">
-                          {{ getStatusText(selectedDispute.status) }}
-                        </v-chip>
-                      </v-list-item-subtitle>
-                    </v-list-item>
-                  </v-list>
-                </v-card-text>
-              </v-card>
-            </v-col>
-          </v-row>
-
-          <!-- 评分对比 -->
-          <v-row>
-            <v-col cols="12">
-              <v-card class="detail-section">
-                <v-card-title class="section-title">评分对比分析</v-card-title>
-                <v-card-text>
-                  <v-row>
-                    <v-col cols="12" md="4">
-                      <v-card class="score-card">
-                        <v-card-text class="text-center">
-                          <div class="score-label">AI评分</div>
-                          <div class="score-value">{{ selectedDispute.aiScore || '-' }}</div>
-                        </v-card-text>
-                      </v-card>
-                    </v-col>
-                    <v-col cols="12" md="4">
-                      <v-card class="score-card">
-                        <v-card-text class="text-center">
-                          <div class="score-label">人工评分</div>
-                          <div class="score-value">{{ selectedDispute.originalScore || '-' }}</div>
-                        </v-card-text>
-                      </v-card>
-                    </v-col>
-                    <v-col cols="12" md="4">
-                      <v-card class="score-card">
-                        <v-card-text class="text-center">
-                          <div class="score-label">建议评分</div>
-                          <div class="score-value">{{ selectedDispute.suggestedScore || '-' }}</div>
-                        </v-card-text>
-                      </v-card>
-                    </v-col>
-                  </v-row>
-                </v-card-text>
-              </v-card>
-            </v-col>
-          </v-row>
-
-          <!-- 复核操作 -->
-          <v-row>
-            <v-col cols="12">
-              <v-card class="detail-section">
-                <v-card-title class="section-title">复核操作</v-card-title>
-                <v-card-text>
-                  <v-form ref="disputeForm">
-                    <v-row>
-                      <v-col cols="12" md="6">
-                        <v-text-field
-                          v-model="finalScore"
-                          label="最终评分"
-                          type="number"
-                          :rules="scoreRules"
-                          variant="outlined"
-                          density="compact"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" md="6">
-                        <v-select
-                          v-model="finalStatus"
-                          :items="finalStatusItems"
-                          label="处理结果"
-                          variant="outlined"
-                          density="compact"
-                        ></v-select>
-                      </v-col>
-                    </v-row>
-                    <v-row>
-                      <v-col cols="12">
-                        <v-textarea
-                          v-model="comment"
-                          label="复核意见"
-                          rows="3"
-                          variant="outlined"
-                          density="compact"
-                        ></v-textarea>
-                      </v-col>
-                    </v-row>
-                  </v-form>
-                </v-card-text>
-              </v-card>
-            </v-col>
-          </v-row>
-        </v-card-text>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="grey" variant="outlined" @click="closeDetailDialog">
-            取消
-          </v-btn>
-          <v-btn color="#42b883" @click="submitDisputeResult">
-            <v-icon left>mdi-check</v-icon>
-            确认复核
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </v-container>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 // 搜索和筛选
 const search = ref('')
-const statusFilter = ref('全部')
-const dateFilter = ref('全部')
+const statusFilter = ref('')
+const dateFilter = ref('')
 
 // 状态选项
 const statusItems = ['全部', '待处理', '处理中', '已解决', '已驳回']
@@ -278,7 +113,7 @@ const dateItems = ['全部', '今日', '本周', '本月']
 
 // 表格头
 const headers = [
-  { title: '案件编号', key: 'id', align: 'start' },
+  { title: '案件编号', key: 'caseNo', align: 'start' },
   { title: '选手姓名', key: 'playerName', align: 'start' },
   { title: '比赛项目', key: 'event', align: 'start' },
   { title: '争议类型', key: 'disputeType', align: 'start' },
@@ -291,7 +126,8 @@ const headers = [
 // 模拟争议数据
 const disputes = ref([
   {
-    id: 'DS001',
+    id: 1,
+    caseNo: 'DS001',
     playerName: '张三',
     event: '太极拳',
     disputeType: '评分偏差',
@@ -304,7 +140,8 @@ const disputes = ref([
     suggestedScore: 8.4
   },
   {
-    id: 'DS002',
+    id: 2,
+    caseNo: 'DS002',
     playerName: '李四',
     event: '长拳',
     disputeType: '技术动作争议',
@@ -317,7 +154,8 @@ const disputes = ref([
     suggestedScore: 8.0
   },
   {
-    id: 'DS003',
+    id: 3,
+    caseNo: 'DS003',
     playerName: '王五',
     event: '南拳',
     disputeType: '评分标准',
@@ -379,54 +217,9 @@ const getPriorityTextColor = (priority) => {
   return 'white'
 }
 
-// 详情对话框
-const detailDialog = ref(false)
-const selectedDispute = ref({})
-const finalScore = ref('')
-const finalStatus = ref('')
-const comment = ref('')
-
-// 最终状态选项
-const finalStatusItems = ['维持原判', '调整分数', '重新评分']
-
-// 分数验证规则
-const scoreRules = [
-  v => !!v || '请输入最终评分',
-  v => (v >= 0 && v <= 10) || '评分必须在0-10之间'
-]
-
-// 打开详情
-const openDisputeDetail = (item) => {
-  selectedDispute.value = item
-  finalScore.value = item.suggestedScore || item.originalScore
-  finalStatus.value = '维持原判'
-  comment.value = ''
-  detailDialog.value = true
-}
-
-// 关闭详情
-const closeDetailDialog = () => {
-  detailDialog.value = false
-  selectedDispute.value = {}
-}
-
-// 提交复核结果
-const submitDisputeResult = () => {
-  // 这里可以添加提交逻辑
-  console.log('提交复核结果:', {
-    disputeId: selectedDispute.value.id,
-    finalScore: finalScore.value,
-    finalStatus: finalStatus.value,
-    comment: comment.value
-  })
-  
-  // 更新状态
-  const index = disputes.value.findIndex(d => d.id === selectedDispute.value.id)
-  if (index !== -1) {
-    disputes.value[index].status = 'resolved'
-  }
-  
-  closeDetailDialog()
+// 查看详情
+const viewDisputeDetail = (id) => {
+  router.push(`/dispute/detail/${id}`)
 }
 
 // 刷新数据
