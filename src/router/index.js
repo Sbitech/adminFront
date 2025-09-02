@@ -1,15 +1,25 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '../views/login/index.vue'
 import JudgeLayout from '../layouts/JudgeLayout.vue'
-import DashboardView from '../views/dashboard/index.vue'
+import HomeView from '../views/home/index.vue'
 import DisputeView from '../views/dispute/index.vue'
+
+// 检查是否已登录（基于refereeInfo）
+const isAuthenticated = () => {
+  try {
+    const refereeInfo = localStorage.getItem('refereeInfo')
+    return !!refereeInfo // 如果有refereeInfo则认为已登录
+  } catch (error) {
+    return false
+  }
+}
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      redirect: '/login'
+      redirect: '/home'
     },
     {
       path: '/login',
@@ -21,9 +31,9 @@ const router = createRouter({
       component: JudgeLayout,
       children: [
         {
-          path: 'dashboard',
-          name: 'dashboard',
-          component: DashboardView
+          path: 'home',
+          name: 'home',
+          component: HomeView
         },
         {
           path: 'dispute',
@@ -78,6 +88,24 @@ const router = createRouter({
       ]
     }
   ]
+})
+
+// 全局前置守卫
+router.beforeEach((to, from, next) => {
+  // 如果访问的是登录页，不做检查
+  if (to.path === '/login') {
+    next()
+    return
+  }
+  
+  // 检查是否已登录
+  if (!isAuthenticated()) {
+    // 未登录，跳转到登录页
+    next('/login')
+  } else {
+    // 已登录，正常访问
+    next()
+  }
 })
 
 export default router

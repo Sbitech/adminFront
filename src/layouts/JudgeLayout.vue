@@ -12,7 +12,7 @@
     >
       <v-list-item
         prepend-avatar="https://randomuser.me/api/portraits/men/85.jpg"
-        title="裁判工作台"
+        :title="refereeName"
         subtitle=""
         nav
       >
@@ -25,8 +25,8 @@
         <v-list-item 
           prepend-icon="mdi-home" 
           title="主页" 
-          value="dashboard" 
-          to="/dashboard"
+          value="home" 
+          to="/home"
           exact
         ></v-list-item>
         <v-list-item 
@@ -243,6 +243,21 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 
+// 裁判姓名
+const refereeName = ref('')
+
+// 获取裁判姓名
+const getRefereeName = () => {
+  // 从完整的refereeInfo中提取裁判姓名
+  try {
+    const refereeInfo = JSON.parse(localStorage.getItem('refereeInfo') || '{}')
+    refereeName.value = refereeInfo.name || refereeInfo.username || '裁判'
+  } catch (error) {
+    console.error('获取裁判信息失败:', error)
+    refereeName.value = '裁判'
+  }
+}
+
 // 消息通知相关状态
 const notifications = ref([
   { id: 1, type: 'info', title: '系统更新', message: '评分系统已更新至 v2.1.3', time: Date.now() - 1000 * 60 * 5, read: false },
@@ -314,6 +329,8 @@ onMounted(() => {
   if (isMobile.value) {
     drawer.value = false
   }
+  // 获取裁判姓名
+  getRefereeName()
 })
 
 onUnmounted(() => {

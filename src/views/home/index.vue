@@ -136,9 +136,6 @@
   </v-container>
 </template>
 
-<script setup>
-// 首页现在只显示内容，导航功能由布局组件提供
-</script>
 
 <style scoped>
 .dashboard-container {

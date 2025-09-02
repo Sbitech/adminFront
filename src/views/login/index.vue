@@ -48,8 +48,9 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { api } from '@/api'
+import axios from 'axios'
 import { VIcon } from 'vuetify/components'
+import { LOGIN_APIS } from '@/config/api.js'
 
 // 定义表单数据
 const form = ref({
@@ -93,12 +94,22 @@ const handleLogin = async () => {
   loading.value = true
 
   try {
-    // 暂时跳过API调用，直接登录成功
-    // 存储一个模拟的token
-    localStorage.setItem('token', 'temp-token-' + Date.now())
-    
-    // 直接跳转到首页
-    router.push('/dashboard')
+    // 使用直接的axios调用后端API登录
+      const response = await axios.post(LOGIN_APIS.REFEREE_LOGIN, {
+        username: form.value.username,
+        password: form.value.password
+      })
+
+      if (response.data) {
+        // 登录成功，存储完整用户信息
+        localStorage.setItem('token', response.data.token || response.data.access_token)
+        localStorage.setItem('refereeInfo', JSON.stringify(response.data.data || response.data))
+        
+        // 跳转到首页
+        router.push('/home')
+      } else {
+        error.value = '用户名或密码错误'
+      }
   } catch (err) {
     error.value = err.response?.data?.message || '登录失败，请重试'
   } finally {
