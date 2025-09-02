@@ -102,7 +102,6 @@ const handleLogin = async () => {
 
       if (response.data) {
         // 登录成功，存储完整用户信息
-        localStorage.setItem('token', response.data.token || response.data.access_token)
         localStorage.setItem('refereeInfo', JSON.stringify(response.data.data || response.data))
         
         // 跳转到首页

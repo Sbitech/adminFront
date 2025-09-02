@@ -346,7 +346,12 @@ const toggleDrawer = () => {
 }
 
 const logout = () => {
+  // 清除所有本地存储的用户信息
   localStorage.removeItem('token')
+  localStorage.removeItem('refereeInfo')
+  localStorage.removeItem('judgeName') // 如果有这个也一并清除
+  
+  // 跳转到登录页
   router.push('/login')
 }
 </script>
