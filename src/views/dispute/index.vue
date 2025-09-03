@@ -1,6 +1,5 @@
 <template>
   <v-container fluid class="dispute-container">
-
     <v-row>
       <v-col cols="12">
         <v-card class="dispute-card">
@@ -10,50 +9,81 @@
           </v-card-title>
           
           <v-card-text>
-            <v-row class="mb-4">
-              <v-col cols="12" md="4">
-                <v-text-field
-                  v-model="search"
-                  prepend-inner-icon="mdi-magnify"
-                  label="搜索争议案件"
-                  variant="outlined"
-                  density="compact"
-                  hide-details
-                ></v-text-field>
-              </v-col>
-              <v-col cols="12" md="3">
+            <v-row align="center">
+              <v-col cols="12" md="2">
                 <v-select
-                  v-model="statusFilter"
-                  :items="statusItems"
-                  label="状态筛选"
+                  v-model="eventCategory"
+                  :items="eventCategories"
+                  item-title="text"
+                  item-value="value"
+                  label="比赛类别"
                   variant="outlined"
                   density="compact"
                   hide-details
-                ></v-select>
-              </v-col>
-              <v-col cols="12" md="3">
-                <v-select
-                  v-model="dateFilter"
-                  :items="dateItems"
-                  label="时间筛选"
-                  variant="outlined"
-                  density="compact"
-                  hide-details
+                  clearable
+                  @update:model-value="fetchData"
                 ></v-select>
               </v-col>
               <v-col cols="12" md="2">
-                <v-btn color="#42b883" block height="40" @click="refreshData">
+                <v-select
+                  v-model="statusFilter"
+                  :items="statusItems"
+                  item-title="text"
+                  item-value="value"
+                  label="申诉状态"
+                  variant="outlined"
+                  density="compact"
+                  hide-details
+                  clearable
+                  @update:model-value="fetchData"
+                ></v-select>
+              </v-col>
+              <v-col cols="12" md="3">
+                <v-text-field
+                  v-model="startTime"
+                  type="datetime-local"
+                  label="开始时间"
+                  variant="outlined"
+                  density="compact"
+                  hide-details
+                  clearable
+                  @update:model-value="fetchData"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" md="3">
+                <v-text-field
+                  v-model="endTime"
+                  type="datetime-local"
+                  label="结束时间"
+                  variant="outlined"
+                  density="compact"
+                  hide-details
+                  clearable
+                  @update:model-value="fetchData"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" md="1">
+                <v-btn color="error" variant="outlined" @click="resetFilters" block>
                   <v-icon left>mdi-refresh</v-icon>
-                  刷新
+                  重置
+                </v-btn>
+              </v-col>
+              <v-col cols="12" md="1">
+                <v-btn color="#42b883" @click="fetchData" block>
+                  <v-icon left>mdi-magnify</v-icon>
+                  查询
                 </v-btn>
               </v-col>
             </v-row>
-
             <!-- 争议案件列表 -->
             <v-data-table
               :headers="headers"
               :items="disputes"
-              :search="search"
+              v-model:options="options"
+              :server-items-length="total"
+              :loading="loading"
+              :items-per-page-options="[10, 20, 50, 100]"
+              show-current-page
               class="dispute-table"
               hover
             >
@@ -66,15 +96,21 @@
                   {{ getStatusText(item.status) }}
                 </v-chip>
               </template>
-              
-              <template v-slot:item.priority="{ item }">
-                <v-chip
-                  :color="getPriorityColor(item.priority)"
-                  :text-color="getPriorityTextColor(item.priority)"
-                  small
-                >
-                  {{ getPriorityText(item.priority) }}
-                </v-chip>
+
+              <template v-slot:item.createTime="{ item }">
+                {{ formatDate(item.createTime) }}
+              </template>
+
+              <template v-slot:item.endTime="{ item }">
+                {{ formatDate(item.endTime) }}
+              </template>
+
+              <template v-slot:item.evidenceUrl="{ item }">
+                <a v-if="item.evidenceUrl" :href="item.evidenceUrl" target="_blank" class="evidence-link">
+                  <v-icon small>mdi-link</v-icon>
+                  查看证据
+                </a>
+                <span v-else>-</span>
               </template>
               
               <template v-slot:item.actions="{ item }">
@@ -88,6 +124,19 @@
                   查看详情
                 </v-btn>
               </template>
+
+              <template v-slot:bottom>
+                 <v-divider />
+                 <v-card-actions class="justify-end">
+                   <v-pagination
+                     v-model="options.page"
+                     :length="Math.ceil(total / options.itemsPerPage)"
+                     :total-visible="7"
+                     color="#42b883"
+                     @update:model-value="handlePageChange"
+                   />
+                 </v-card-actions>
+               </template>
             </v-data-table>
           </v-card-text>
         </v-card>
@@ -97,124 +146,94 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import axios from 'axios'
 
 const router = useRouter()
 
-// 搜索和筛选
-const search = ref('')
+// 查询参数
+const eventCategory = ref('')
+const startTime = ref('')
+const endTime = ref('')
 const statusFilter = ref('')
-const dateFilter = ref('')
+
+
+
+// 表格相关
+const loading = ref(false)
+const disputes = ref([])
+const total = ref(0)
+const options = ref({
+  page: 1,
+  itemsPerPage: 10,
+  sortBy: [],
+  sortDesc: [],
+  multiSort: false,
+  mustSort: false
+})
 
 // 状态选项
-const statusItems = ['全部', '待处理', '处理中', '已解决', '已驳回']
-const dateItems = ['全部', '今日', '本周', '本月']
-
-// 表格头
-const headers = [
-  { title: '案件编号', key: 'caseNo', align: 'start' },
-  { title: '选手姓名', key: 'playerName', align: 'start' },
-  { title: '比赛项目', key: 'event', align: 'start' },
-  { title: '争议类型', key: 'disputeType', align: 'start' },
-  { title: '状态', key: 'status', align: 'center' },
-  { title: '优先级', key: 'priority', align: 'center' },
-  { title: '提出时间', key: 'createdTime', align: 'start' },
-  { title: '操作', key: 'actions', align: 'center', sortable: false }
+const statusItems = [
+  { text: '全部', value: '' },
+  { text: '待处理', value: '0' },
+  { text: '已处理', value: '1' },
+  { text: '驳回', value: '2' }
 ]
 
-// 模拟争议数据
-const disputes = ref([
-  {
-    id: 1,
-    caseNo: 'DS001',
-    playerName: '张三',
-    event: '太极拳',
-    disputeType: '评分偏差',
-    status: 'pending',
-    priority: 'high',
-    createdTime: '2025-06-15 14:30',
-    originalScore: 8.2,
-    aiScore: 8.5,
-    reason: 'AI评分与人工评分差异较大，需要复核',
-    suggestedScore: 8.4
-  },
-  {
-    id: 2,
-    caseNo: 'DS002',
-    playerName: '李四',
-    event: '长拳',
-    disputeType: '技术动作争议',
-    status: 'processing',
-    priority: 'medium',
-    createdTime: '2025-07-15 15:45',
-    originalScore: 7.8,
-    aiScore: 8.1,
-    reason: '对某个技术动作的评分标准存在争议',
-    suggestedScore: 8.0
-  },
-  {
-    id: 3,
-    caseNo: 'DS003',
-    playerName: '王五',
-    event: '南拳',
-    disputeType: '评分标准',
-    status: 'resolved',
-    priority: 'low',
-    createdTime: '2025-08-15 16:20',
-    originalScore: 9.0,
-    aiScore: 8.8,
-    reason: '评分标准理解不一致',
-    suggestedScore: 8.9
-  }
+// 比赛类别选项 - 从API获取
+const eventCategories = ref([
+  { text: '全部', value: '' }
 ])
+
+// 表格头 - 与后端属性对应，不包含id、reviewOpinion、reason
+const headers = [
+  { title: '比赛记录ID', key: 'playMatchId', align: 'start' },
+  { title: '申诉标题', key: 'title', align: 'start' },
+  { title: '证据材料', key: 'evidenceUrl', align: 'start' },
+  { title: '申诉状态', key: 'status', align: 'center' },
+  { title: '项目类别', key: 'category', align: 'start' },
+  { title: '创建时间', key: 'createTime', align: 'start' },
+  { title: '审核时间', key: 'reviewTime', align: 'start' },
+  { title: '操作', key: 'actions', align: 'center', sortable: false }
+]
 
 // 状态相关方法
 const getStatusColor = (status) => {
   const colors = {
-    pending: 'orange',
-    processing: 'blue',
-    resolved: 'green',
-    rejected: 'red'
+    '0': 'orange',
+    '1': 'green',
+    '2': 'red'
   }
   return colors[status] || 'grey'
 }
 
 const getStatusText = (status) => {
   const texts = {
-    pending: '待处理',
-    processing: '处理中',
-    resolved: '已解决',
-    rejected: '已驳回'
+    '0': '待处理',
+    '1': '已处理',
+    '2': '驳回'
   }
   return texts[status] || status
 }
 
-const getStatusTextColor = (status) => {
-  return 'white'
-}
+const getStatusTextColor = () => 'white'
 
-// 优先级相关方法
-const getPriorityColor = (priority) => {
-  const colors = {
-    high: 'red',
-    medium: 'orange',
-    low: 'green'
+// 时间格式化方法
+const formatDate = (dateString) => {
+  if (!dateString) return '-'
+  try {
+    const date = new Date(dateString)
+    return date.toLocaleString('zh-CN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  } catch (error) {
+    return dateString
   }
-  return colors[priority] || 'grey'
-}
-
-const getPriorityText = (priority) => {
-  const texts = {
-    high: '高',
-    medium: '中',
-    low: '低'
-  }
-  return texts[priority] || priority
-}
-
-const getPriorityTextColor = (priority) => {
-  return 'white'
 }
 
 // 查看详情
@@ -222,11 +241,90 @@ const viewDisputeDetail = (id) => {
   router.push(`/dispute/detail/${id}`)
 }
 
-// 刷新数据
-const refreshData = () => {
-  // 这里可以添加数据刷新逻辑
-  console.log('刷新争议数据')
+// 获取比赛类别列表
+const fetchEventCategories = async () => {
+  try {
+    const response = await axios.get('http://localhost:9091/events/getCategory')
+    if (response.data && Array.isArray(response.data)) {
+      const categories = response.data.map(item => ({
+        text: item.category,
+        value: item.category
+      }))
+      eventCategories.value = [
+        { text: '全部', value: '' },
+        ...categories
+      ]
+    }
+  } catch (error) {
+    console.error('获取比赛类别失败:', error)
+  }
 }
+
+
+
+// 格式化时间 - 移除T并确保格式正确
+const formatDateTime = (dateTimeStr) => {
+  if (!dateTimeStr) return ''
+  return dateTimeStr.replace('T', ' ')
+}
+
+// 获取数据
+const fetchData = async () => {
+  loading.value = true
+  try {
+    const params = {
+      pageNum: options.value.page,
+      pageSize: options.value.itemsPerPage
+    }
+
+    // 只添加有值的参数，并格式化时间
+    if (startTime.value) params.startTime = formatDateTime(startTime.value)
+    if (endTime.value) params.endTime = formatDateTime(endTime.value)
+    if (eventCategory.value) params.eventCategory = eventCategory.value
+    if (statusFilter.value !== '') params.status = statusFilter.value
+
+    const response = await axios.post('http://localhost:9091/disputes/list', params)
+
+    disputes.value = response.data.list
+    total.value = response.data.total
+  } catch (error) {
+    console.error('获取争议列表失败:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 监听表格选项变化（分页、排序等）
+watch(
+  () => options.value,
+  (newOptions) => {
+    console.log('分页参数变化:', newOptions)
+    fetchData()
+  },
+  { deep: true }
+)
+
+// 手动分页切换
+const handlePageChange = (page) => {
+  options.value.page = page
+  fetchData()
+}
+
+// 重置筛选条件
+const resetFilters = () => {
+  eventCategory.value = ''
+  statusFilter.value = ''
+  startTime.value = ''
+  endTime.value = ''
+  options.value.page = 1
+  fetchData()
+}
+
+// 页面加载时获取数据
+onMounted(() => {
+  fetchEventCategories()
+  fetchData()
+})
 </script>
 
 <style scoped>
@@ -302,5 +400,15 @@ const refreshData = () => {
 
 .v-chip {
   font-weight: 500;
+}
+
+.evidence-link {
+  color: #42b883;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.evidence-link:hover {
+  text-decoration: underline;
 }
 </style>
