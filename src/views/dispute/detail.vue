@@ -3,6 +3,13 @@
     <v-row>
       <v-col cols="12">
         <v-card class="detail-card">
+          <div v-if="loading" class="d-flex justify-center align-center" style="height: 400px;">
+            <v-progress-circular
+              indeterminate
+              color="#42b883"
+              size="64"
+            ></v-progress-circular>
+          </div>
           <v-card-title class="detail-header" style="background-color: transparent; color: #333;">
             <div class="d-flex align-center justify-space-between">
               <div class="d-flex align-center">
@@ -16,7 +23,7 @@
                 争议详情记录
               </div>
               <v-chip color="#42b883" variant="elevated">
-                {{ formatDateTime(disputeDetail.createdAt) }}
+                {{ formatDateTime(disputeDetail.createTime) }}
               </v-chip>
             </div>
           </v-card-title>
@@ -37,21 +44,21 @@
                           <v-icon>mdi-account-circle</v-icon>
                         </template>
                         <v-list-item-title>选手姓名</v-list-item-title>
-                        <v-list-item-subtitle>{{ disputeDetail.playerName }}</v-list-item-subtitle>
+                        <v-list-item-subtitle>{{ disputeDetail.realName }}</v-list-item-subtitle>
                       </v-list-item>
                       <v-list-item>
                         <template v-slot:prepend>
                           <v-icon>mdi-medal</v-icon>
                         </template>
                         <v-list-item-title>比赛项目</v-list-item-title>
-                        <v-list-item-subtitle>{{ disputeDetail.event }}</v-list-item-subtitle>
+                        <v-list-item-subtitle>{{ disputeDetail.name }} - {{ disputeDetail.category }}</v-list-item-subtitle>
                       </v-list-item>
                       <v-list-item>
                         <template v-slot:prepend>
-                          <v-icon>mdi-clock</v-icon>
+                          <v-icon>mdi-star</v-icon>
                         </template>
-                        <v-list-item-title>比赛时间</v-list-item-title>
-                        <v-list-item-subtitle>{{ formatDateTime(disputeDetail.matchTime) }}</v-list-item-subtitle>
+                        <v-list-item-title>原始评分</v-list-item-title>
+                        <v-list-item-subtitle>{{ disputeDetail.score }}分</v-list-item-subtitle>
                       </v-list-item>
                     </v-list>
                   </v-card-text>
@@ -74,104 +81,80 @@
                           <v-icon>mdi-identifier</v-icon>
                         </template>
                         <v-list-item-title>案件编号</v-list-item-title>
-                        <v-list-item-subtitle>{{ disputeDetail.caseNo }}</v-list-item-subtitle>
+                        <v-list-item-subtitle>{{ disputeDetail.id }}</v-list-item-subtitle>
                       </v-list-item>
                       <v-list-item>
                         <template v-slot:prepend>
                           <v-icon>mdi-calendar</v-icon>
                         </template>
                         <v-list-item-title>创建时间</v-list-item-title>
-                        <v-list-item-subtitle>{{ formatDateTime(disputeDetail.createdAt) }}</v-list-item-subtitle>
+                        <v-list-item-subtitle>{{ formatDateTime(disputeDetail.createTime) }}</v-list-item-subtitle>
                       </v-list-item>
                       <v-list-item>
                         <template v-slot:prepend>
-                          <v-icon>mdi-information</v-icon>
+                          <v-icon>mdi-format-title</v-icon>
                         </template>
-                        <v-list-item-title>状态</v-list-item-title>
-                        <v-list-item-subtitle>
-                          <v-chip :color="getStatusColor(disputeDetail.status)" size="small">
-                            {{ disputeDetail.status }}
-                          </v-chip>
-                        </v-list-item-subtitle>
+                        <v-list-item-title>争议标题</v-list-item-title>
+                        <v-list-item-subtitle>{{ disputeDetail.title }}</v-list-item-subtitle>
                       </v-list-item>
+                      <v-list-item>
+                          <template v-slot:prepend>
+                            <v-icon>mdi-information</v-icon>
+                          </template>
+                          <v-list-item-title>状态</v-list-item-title>
+                          <v-list-item-subtitle>
+                            <v-chip :color="getStatusColor(disputeDetail.status)" size="small">
+                              {{ getStatusText(disputeDetail.status) }}
+                            </v-chip>
+                          </v-list-item-subtitle>
+                        </v-list-item>
                     </v-list>
                   </v-card-text>
                 </v-card>
               </v-col>
 
-              <!-- 评分对比分析 -->
-              <v-col cols="12">
+              <!-- 评分信息 -->
+              <v-col cols="12" md="4">
                 <v-card variant="outlined" class="info-card">
                   <v-card-title class="text-subtitle-1 font-weight-bold">
-                    <v-icon left>mdi-chart-compare</v-icon>
-                    评分对比分析
+                    <v-icon left>mdi-star</v-icon>
+                    评分信息
                   </v-card-title>
                   <v-card-text>
-                    <v-row>
-                      <v-col cols="12" sm="4">
-                        <v-card class="score-card" color="blue-lighten-5">
-                          <v-card-text class="text-center">
-                            <div class="text-h5 font-weight-bold text-blue">{{ disputeDetail.originalScore }}</div>
-                            <div class="text-caption">原始评分</div>
-                          </v-card-text>
-                        </v-card>
-                      </v-col>
-                      <v-col cols="12" sm="4">
-                        <v-card class="score-card" color="red-lighten-5">
-                          <v-card-text class="text-center">
-                            <div class="text-h5 font-weight-bold text-red">{{ disputeDetail.disputeScore }}</div>
-                            <div class="text-caption">争议评分</div>
-                          </v-card-text>
-                        </v-card>
-                      </v-col>
-                      <v-col cols="12" sm="4">
-                        <v-card class="score-card" color="green-lighten-5">
-                          <v-card-text class="text-center">
-                            <div class="text-h5 font-weight-bold text-green">{{ disputeDetail.finalScore }}</div>
-                            <div class="text-caption">复核评分</div>
-                          </v-card-text>
-                        </v-card>
-                      </v-col>
-                    </v-row>
+                    <v-card class="score-card" color="blue-lighten-5">
+                      <v-card-text class="text-center">
+                        <div class="text-h4 font-weight-bold text-blue">{{ disputeDetail.score }}</div>
+                        <div class="text-caption">原始评分</div>
+                      </v-card-text>
+                    </v-card>
                   </v-card-text>
                 </v-card>
               </v-col>
 
-              <!-- 争议原因和技术分析 -->
-              <v-col cols="12">
+              <!-- 争议详情 -->
+              <v-col cols="12" md="8">
                 <v-card variant="outlined" class="info-card">
                   <v-card-title class="text-subtitle-1 font-weight-bold">
                     <v-icon left>mdi-file-document</v-icon>
-                    争议原因与技术分析
+                    争议详情
                   </v-card-title>
                   <v-card-text>
-                    <v-row>
-                      <v-col cols="12" md="8">
-                        <div class="text-h6 mb-2">争议原因</div>
-                        <v-card class="pa-4 mb-4" color="red-lighten-5">
-                          <div class="text-body-1">{{ disputeDetail.reason }}</div>
-                        </v-card>
-                        
-                        <div class="text-h6 mb-2">技术分析</div>
-                        <v-card class="pa-4" color="blue-lighten-5">
-                          <div class="text-body-1">{{ disputeDetail.analysis }}</div>
-                        </v-card>
-                      </v-col>
-                      <v-col cols="12" md="4">
-                        <v-card class="stats-card" color="grey-lighten-4">
-                          <v-card-text>
-                            <div class="text-center">
-                              <v-icon size="48" color="grey">mdi-information</v-icon>
-                              <div class="text-h6 mt-2">复核说明</div>
-                              <div class="text-caption mt-2">
-                                争议处理经过技术专家分析，
-                                结合评分标准和比赛规则进行最终判定。
-                              </div>
-                            </div>
-                          </v-card-text>
-                        </v-card>
-                      </v-col>
-                    </v-row>
+                    <div class="text-h6 mb-2">争议原因</div>
+                    <v-card class="pa-4 mb-4" color="red-lighten-5">
+                      <div class="text-body-1">{{ disputeDetail.reason }}</div>
+                    </v-card>
+                    
+                    <div v-if="disputeDetail.evidenceUrl" class="text-h6 mb-2">证据链接</div>
+                    <v-card v-if="disputeDetail.evidenceUrl" class="pa-4 mb-4" color="purple-lighten-5">
+                      <a :href="disputeDetail.evidenceUrl" target="_blank" class="text-body-1" style="color: #42b883;">
+                        {{ disputeDetail.evidenceUrl }}
+                      </a>
+                    </v-card>
+                    
+                    <div v-if="disputeDetail.reviewOpinion" class="text-h6 mb-2">复核意见</div>
+                    <v-card v-if="disputeDetail.reviewOpinion" class="pa-4" color="blue-lighten-5">
+                      <div class="text-body-1">{{ disputeDetail.reviewOpinion }}</div>
+                    </v-card>
                   </v-card-text>
                 </v-card>
               </v-col>
@@ -195,22 +178,16 @@
                       </thead>
                       <tbody>
                         <tr>
-                          <td>{{ formatDateTime(disputeDetail.createdAt) }}</td>
-                          <td><v-chip size="small" color="red">争议提出</v-chip></td>
-                          <td>{{ disputeDetail.playerName }}</td>
+                          <td>{{ formatDateTime(disputeDetail.createTime) }}</td>
+                          <td><v-chip size="small" :color="getStatusColor(disputeDetail.status)">{{ getStatusText(disputeDetail.status) }}</v-chip></td>
+                          <td>{{ disputeDetail.realName }}</td>
                           <td>争议原因：{{ disputeDetail.reason }}</td>
                         </tr>
-                        <tr>
+                        <tr v-if="disputeDetail.reviewTime && disputeDetail.reviewOpinion">
                           <td>{{ formatDateTime(disputeDetail.reviewTime) }}</td>
-                          <td><v-chip size="small" color="blue">技术审核</v-chip></td>
+                          <td><v-chip size="small" color="blue">复核完成</v-chip></td>
                           <td>技术专家组</td>
-                          <td>技术分析完成，确认评分调整</td>
-                        </tr>
-                        <tr>
-                          <td>{{ formatDateTime(disputeDetail.resolveTime) }}</td>
-                          <td><v-chip size="small" color="green">争议解决</v-chip></td>
-                          <td>裁判长</td>
-                          <td>争议处理完成，最终评分：{{ disputeDetail.finalScore }}分</td>
+                          <td>复核意见：{{ disputeDetail.reviewOpinion }}</td>
                         </tr>
                       </tbody>
                     </v-table>
@@ -228,43 +205,57 @@
 <script>
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import axios from 'axios'
 
 export default {
   name: 'DisputeDetail',
   setup() {
     const route = useRoute()
     const disputeDetail = ref({
-      caseNo: '',
-      playerName: '',
-      event: '',
-      matchTime: '',
-      createdAt: '',
-      status: '',
-      originalScore: 0,
-      disputeScore: 0,
-      finalScore: 0,
+      id: '',
+      playMatchId: '',
+      title: '',
       reason: '',
-      analysis: '',
+      evidenceUrl: '',
+      status: '',
+      reviewOpinion: '',
+      createTime: '',
       reviewTime: '',
-      resolveTime: ''
+      name: '',
+      category: '',
+      score: 0,
+      realName: ''
     })
+    const loading = ref(true)
 
-    const loadDisputeDetail = () => {
+    const loadDisputeDetail = async () => {
       const id = route.params.id
-      disputeDetail.value = {
-        caseNo: `DSP-2024-${String(id).padStart(3, '0')}`,
-        playerName: '张武术',
-        event: '男子长拳',
-        matchTime: '2024-01-15 14:30:00',
-        createdAt: '2024-01-15 15:45:00',
-        status: '已解决',
-        originalScore: 8.5,
-        disputeScore: 9.2,
-        finalScore: 8.8,
-        reason: '认为动作完成度评分偏低，特别是腾空飞脚的高度和远度',
-        analysis: '经技术专家组复核，原评分8.5分确实偏低。选手腾空飞脚动作标准，高度和远度均达到优秀水平，应给予更高评分。综合考虑动作难度系数和完成质量，最终调整为8.8分。',
-        reviewTime: '2024-01-15 16:30:00',
-        resolveTime: '2024-01-15 17:00:00'
+      loading.value = true
+      try {
+        const response = await axios.get(`http://localhost:9091/disputes/detail/${id}`)
+        const data = response.data
+        
+        // 映射后端数据到前端结构
+        disputeDetail.value = {
+          id: data.id || '',
+          playMatchId: data.playMatchId || '',
+          title: data.title || '',
+          reason: data.reason || '',
+          evidenceUrl: data.evidenceUrl || '',
+          status: data.status || '',
+          reviewOpinion: data.reviewOpinion || '',
+          createTime: data.createTime || '',
+          reviewTime: data.reviewTime || '',
+          name: data.name || '',
+          category: data.category || '',
+          score: data.score || 0,
+          realName: data.realName || ''
+        }
+      } catch (error) {
+        console.error('获取争议详情失败:', error)
+        // 可以添加错误提示
+      } finally {
+        loading.value = false
       }
     }
 
@@ -281,13 +272,22 @@ export default {
     }
 
     const getStatusColor = (status) => {
+      const statusText = getStatusText(status)
       const colorMap = {
         '待处理': 'orange',
-        '处理中': 'blue',
-        '已解决': 'green',
-        '已拒绝': 'red'
+        '已处理': 'green',
+        '驳回': 'red'
       }
-      return colorMap[status] || 'grey'
+      return colorMap[statusText] || 'grey'
+    }
+
+    const getStatusText = (status) => {
+      const statusMap = {
+        0: '待处理',
+        1: '已处理',
+        2: '驳回'
+      }
+      return statusMap[status] || status
     }
 
     onMounted(() => {
@@ -296,8 +296,10 @@ export default {
 
     return {
       disputeDetail,
+      loading,
       formatDateTime,
-      getStatusColor
+      getStatusColor,
+      getStatusText
     }
   }
 }

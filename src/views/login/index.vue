@@ -50,7 +50,6 @@ import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import { VIcon } from 'vuetify/components'
-import { LOGIN_APIS } from '@/config/api.js'
 
 // 定义表单数据
 const form = ref({
@@ -95,7 +94,7 @@ const handleLogin = async () => {
 
   try {
     // 使用直接的axios调用后端API登录
-      const response = await axios.post(LOGIN_APIS.REFEREE_LOGIN, {
+      const response = await axios.post('http://localhost:9091/referee/login', {
         username: form.value.username,
         password: form.value.password
       })
