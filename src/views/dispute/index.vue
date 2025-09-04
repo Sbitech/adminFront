@@ -7,60 +7,26 @@
             <v-icon left>mdi-file-document-edit</v-icon>
             争议复核管理
           </v-card-title>
-          
+
           <v-card-text>
             <v-row align="center">
               <v-col cols="12" md="2">
-                <v-select
-                  v-model="eventCategory"
-                  :items="eventCategories"
-                  item-title="text"
-                  item-value="value"
-                  label="比赛类别"
-                  variant="outlined"
-                  density="compact"
-                  hide-details
-                  clearable
-                  @update:model-value="fetchData"
-                ></v-select>
+                <v-select v-model="eventCategory" :items="eventCategories" item-title="text" item-value="value"
+                  label="比赛类别" variant="outlined" density="compact" hide-details clearable
+                  @update:model-value="fetchData(true)"></v-select>
               </v-col>
               <v-col cols="12" md="2">
-                <v-select
-                  v-model="statusFilter"
-                  :items="statusItems"
-                  item-title="text"
-                  item-value="value"
-                  label="申诉状态"
-                  variant="outlined"
-                  density="compact"
-                  hide-details
-                  clearable
-                  @update:model-value="fetchData"
-                ></v-select>
+                <v-select v-model="statusFilter" :items="statusItems" item-title="text" item-value="value" label="申诉状态"
+                  variant="outlined" density="compact" hide-details clearable
+                  @update:model-value="fetchData(true)"></v-select>
               </v-col>
               <v-col cols="12" md="3">
-                <v-text-field
-                  v-model="startTime"
-                  type="datetime-local"
-                  label="开始时间"
-                  variant="outlined"
-                  density="compact"
-                  hide-details
-                  clearable
-                  @update:model-value="fetchData"
-                ></v-text-field>
+                <v-text-field v-model="startTime" type="datetime-local" label="开始时间" variant="outlined"
+                  density="compact" hide-details clearable @update:model-value="fetchData(true)"></v-text-field>
               </v-col>
               <v-col cols="12" md="3">
-                <v-text-field
-                  v-model="endTime"
-                  type="datetime-local"
-                  label="结束时间"
-                  variant="outlined"
-                  density="compact"
-                  hide-details
-                  clearable
-                  @update:model-value="fetchData"
-                ></v-text-field>
+                <v-text-field v-model="endTime" type="datetime-local" label="结束时间" variant="outlined" density="compact"
+                  hide-details clearable @update:model-value="fetchData(true)"></v-text-field>
               </v-col>
               <v-col cols="12" md="1">
                 <v-btn color="error" variant="outlined" @click="resetFilters" block>
@@ -69,30 +35,18 @@
                 </v-btn>
               </v-col>
               <v-col cols="12" md="1">
-                <v-btn color="#42b883" @click="fetchData" block>
+                <v-btn color="#42b883" @click="fetchData(true)" block>
                   <v-icon left>mdi-magnify</v-icon>
                   查询
                 </v-btn>
               </v-col>
             </v-row>
             <!-- 争议案件列表 -->
-            <v-data-table
-              :headers="headers"
-              :items="disputes"
-              v-model:options="options"
-              :server-items-length="total"
-              :loading="loading"
-              :items-per-page-options="[10, 20, 50, 100]"
-              show-current-page
-              class="dispute-table"
-              hover
-            >
+            <v-data-table :headers="headers" :items="disputes" v-model:options="options" :server-items-length="total"
+              :loading="loading" :items-per-page-options="[10, 20, 50, 100]" show-current-page class="dispute-table"
+              hover>
               <template v-slot:item.status="{ item }">
-                <v-chip
-                  :color="getStatusColor(item.status)"
-                  :text-color="getStatusTextColor(item.status)"
-                  small
-                >
+                <v-chip :color="getStatusColor(item.status)" :text-color="getStatusTextColor(item.status)" small>
                   {{ getStatusText(item.status) }}
                 </v-chip>
               </template>
@@ -112,31 +66,21 @@
                 </a>
                 <span v-else>-</span>
               </template>
-              
+
               <template v-slot:item.actions="{ item }">
-                <v-btn
-                  color="#42b883"
-                  small
-                  variant="outlined"
-                  @click="viewDisputeDetail(item.id)"
-                >
+                <v-btn color="#42b883" small variant="outlined" @click="viewDisputeDetail(item.id)">
                   <v-icon left small>mdi-eye</v-icon>
                   查看详情
                 </v-btn>
               </template>
 
               <template v-slot:bottom>
-                 <v-divider />
-                 <v-card-actions class="justify-end">
-                   <v-pagination
-                     v-model="options.page"
-                     :length="Math.ceil(total / options.itemsPerPage)"
-                     :total-visible="7"
-                     color="#42b883"
-                     @update:model-value="handlePageChange"
-                   />
-                 </v-card-actions>
-               </template>
+                <v-divider />
+                <v-card-actions class="justify-end">
+                  <v-pagination v-model="options.page" :length="Math.ceil(total / options.itemsPerPage)"
+                    :total-visible="7" color="#42b883" @update:model-value="handlePageChange" />
+                </v-card-actions>
+              </template>
             </v-data-table>
           </v-card-text>
         </v-card>
@@ -269,9 +213,14 @@ const formatDateTime = (dateTimeStr) => {
 }
 
 // 获取数据
-const fetchData = async () => {
+const fetchData = async (resetPage = false) => {
   loading.value = true
   try {
+    // 如果重置页码，强制回到第一页
+    if (resetPage) {
+      options.value.page = 1
+    }
+    
     const params = {
       pageNum: options.value.page,
       pageSize: options.value.itemsPerPage
@@ -287,6 +236,14 @@ const fetchData = async () => {
 
     disputes.value = response.data.list
     total.value = response.data.total
+    
+    // 如果当前页码大于总页数，重置到第一页
+    const totalPages = Math.ceil(total.value / options.value.itemsPerPage)
+    if (options.value.page > totalPages && totalPages > 0) {
+      options.value.page = 1
+      fetchData() // 重新获取第一页数据
+      return
+    }
   } catch (error) {
     console.error('获取争议列表失败:', error)
   } finally {
@@ -294,15 +251,18 @@ const fetchData = async () => {
   }
 }
 
-// 监听表格选项变化（分页、排序等）
-watch(
-  () => options.value,
-  (newOptions) => {
-    console.log('分页参数变化:', newOptions)
-    fetchData()
-  },
-  { deep: true }
-)
+// 监听表格选项变化（仅分页、排序等，不包含筛选条件）
+  watch(
+    () => options.value,
+    (newOptions, oldOptions) => {
+      // 只有当页码或每页条数变化时才重新获取数据
+      if (newOptions.page !== oldOptions.page || newOptions.itemsPerPage !== oldOptions.itemsPerPage) {
+        console.log('分页参数变化:', newOptions)
+        fetchData()
+      }
+    },
+    { deep: true }
+  )
 
 // 手动分页切换
 const handlePageChange = (page) => {
