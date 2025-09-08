@@ -112,8 +112,7 @@ const matches = ref([
     date: '2024-01-15',
     player1: '张三',
     player2: '李四',
-    videoUrl: 'https://wushu-demo.oss-cn-beijing.aliyuncs.com/%E8%A7%86%E9%A2%91demo.mp4?Expires=1757051512&OSSAccessKeyId=TMP.3Kp1DRL3mVeY9QWi4zV9fcnuSkiKD1oVPhLgQpJLjLyXxMJSrKnDToZd7TQmYsRGxkRMBNo19vuYEj8eME8yUR3DcDhMZS&Signature=9cEa4jtRkyAiWKyeVX7TONRQ7h4%3D'
-  },
+    videoUrl: 'https://wushu-demo.oss-cn-beijing.aliyuncs.com/%E8%A7%86%E9%A2%91demo.mp4'  },
   {
     id: 2,
     title: '场次 002 - 王五 vs 赵六',
