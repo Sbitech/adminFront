@@ -94,7 +94,7 @@ const handleLogin = async () => {
 
   try {
     // 使用直接的axios调用后端API登录
-      const response = await axios.post('http://localhost:9091/referee/login', {
+      const response = await axios.post('http://localhost:9090/referee/login', {
         username: form.value.username,
         password: form.value.password
       })

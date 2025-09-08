@@ -6,6 +6,10 @@ import path from 'path'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [vue(), vuetify()],
+  server:{
+    port: 9092,
+    open: true
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),

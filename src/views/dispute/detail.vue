@@ -232,7 +232,7 @@ export default {
       const id = route.params.id
       loading.value = true
       try {
-        const response = await axios.get(`http://localhost:9091/disputes/detail/${id}`)
+        const response = await axios.get(`http://localhost:9090/disputes/detail/${id}`)
         const data = response.data
         
         // 映射后端数据到前端结构

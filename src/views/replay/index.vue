@@ -12,54 +12,22 @@
 
             <v-row class="mb-4">
               <v-col cols="12" md="3">
-                <v-select
-                  v-model="selectedEvent"
-                  label="比赛项目"
-                  :items="eventOptions"
-                  variant="outlined"
-                  density="compact"
-                  hide-details
-                  clearable
-                ></v-select>
+                <v-select v-model="selectedEvent" label="比赛项目" :items="eventOptions" variant="outlined"
+                  density="compact" hide-details clearable></v-select>
               </v-col>
               <v-col cols="12" md="3">
-                <v-text-field
-                  v-model="selectedDate"
-                  label="选择日期"
-                  type="date"
-                  variant="outlined"
-                  density="compact"
-                  hide-details
-                  clearable
-                ></v-text-field>
+                <v-text-field v-model="selectedDate" label="选择日期" type="date" variant="outlined" density="compact"
+                  hide-details clearable></v-text-field>
               </v-col>
               <v-col cols="12" md="3">
-                <v-text-field
-                  v-model="searchKeyword"
-                  label="搜索选手"
-                  prepend-icon="mdi-magnify"
-                  variant="outlined"
-                  density="compact"
-                  hide-details
-                  clearable
-                ></v-text-field>
+                <v-text-field v-model="searchKeyword" label="搜索选手" prepend-icon="mdi-magnify" variant="outlined"
+                  density="compact" hide-details clearable></v-text-field>
               </v-col>
               <v-col cols="12" md="3" class="d-flex align-end">
-                <v-btn
-                  color="grey"
-                  prepend-icon="mdi-restore"
-                  @click="resetFilters"
-                  class="mr-2"
-                  size="small"
-                >
+                <v-btn color="grey" prepend-icon="mdi-restore" @click="resetFilters" class="mr-2" size="small">
                   重置
                 </v-btn>
-                <v-btn
-                  color="#42b883"
-                  prepend-icon="mdi-filter"
-                  @click="applyFilters"
-                  size="small"
-                >
+                <v-btn color="#42b883" prepend-icon="mdi-filter" @click="applyFilters" size="small">
                   筛选
                 </v-btn>
               </v-col>
@@ -68,14 +36,8 @@
             <v-row>
               <v-col cols="12" lg="8">
                 <v-card class="video-player" style="aspect-ratio: 16/8; max-height: 600px;">
-                  <video
-                    v-if="selectedMatch && selectedMatch.videoUrl"
-                    :src="selectedMatch.videoUrl"
-                    controls
-                    autoplay
-                    class="video-element"
-                    @error="handleVideoError"
-                  >
+                  <video v-if="selectedMatch && selectedMatch.videoUrl" :src="selectedMatch.videoUrl" controls autoplay
+                    class="video-element" @error="handleVideoError">
                     您的浏览器不支持视频播放。
                   </video>
                   <v-card-text v-else class="text-center">
@@ -85,7 +47,7 @@
                   </v-card-text>
                 </v-card>
               </v-col>
-              
+
               <v-col cols="12" lg="4">
                 <v-card class="match-list" max-height="600" style="overflow-y: auto;">
                   <v-card-title class="sticky-title">
@@ -96,14 +58,9 @@
                   </v-card-title>
                   <v-card-text class="pa-0">
                     <v-list density="compact" style="max-height: 520px; overflow-y: auto;">
-                      <v-list-item
-                        v-for="(match, index) in filteredMatches"
-                        :key="match.id"
-                        :class="{ 'selected-match': selectedMatch?.id === match.id }"
-                        @click="selectMatch(match)"
-                        class="match-item"
-                        :style="{ borderTop: index === 0 ? 'none' : '1px solid #f0f0f0' }"
-                      >
+                      <v-list-item v-for="(match, index) in filteredMatches" :key="match.id"
+                        :class="{ 'selected-match': selectedMatch?.id === match.id }" @click="selectMatch(match)"
+                        class="match-item" :style="{ borderTop: index === 0 ? 'none' : '1px solid #f0f0f0' }">
                         <v-list-item-title class="text-body-2 font-weight-medium">{{ match.title }}</v-list-item-title>
                         <v-list-item-subtitle class="text-caption">
                           {{ match.event }} • {{ match.date }} {{ match.time }}
@@ -155,7 +112,7 @@ const matches = ref([
     date: '2024-01-15',
     player1: '张三',
     player2: '李四',
-    videoUrl: '/videos/match001.mp4'
+    videoUrl: 'https://wushu-demo.oss-cn-beijing.aliyuncs.com/%E8%A7%86%E9%A2%91demo.mp4?Expires=1757051512&OSSAccessKeyId=TMP.3Kp1DRL3mVeY9QWi4zV9fcnuSkiKD1oVPhLgQpJLjLyXxMJSrKnDToZd7TQmYsRGxkRMBNo19vuYEj8eME8yUR3DcDhMZS&Signature=9cEa4jtRkyAiWKyeVX7TONRQ7h4%3D'
   },
   {
     id: 2,
@@ -277,7 +234,7 @@ const matches = ref([
     player2: '郑十五',
     videoUrl: '/videos/match013.mp4'
   },
-  
+
 ])
 
 // 筛选后的比赛列表
@@ -287,24 +244,24 @@ const filteredMatches = computed(() => {
     if (selectedEvent.value && match.event !== selectedEvent.value) {
       return false
     }
-    
+
     // 日期筛选
     if (selectedDate.value && match.date !== selectedDate.value) {
       return false
     }
-    
+
     // 选手姓名搜索
     if (searchKeyword.value) {
       const keyword = searchKeyword.value.toLowerCase()
       const title = match.title.toLowerCase()
       const player1 = match.player1.toLowerCase()
       const player2 = match.player2.toLowerCase()
-      
-      return title.includes(keyword) || 
-             player1.includes(keyword) || 
-             player2.includes(keyword)
+
+      return title.includes(keyword) ||
+        player1.includes(keyword) ||
+        player2.includes(keyword)
     }
-    
+
     return true
   })
 })

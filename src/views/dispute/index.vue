@@ -188,7 +188,7 @@ const viewDisputeDetail = (id) => {
 // 获取比赛类别列表
 const fetchEventCategories = async () => {
   try {
-    const response = await axios.get('http://localhost:9091/events/getCategory')
+    const response = await axios.get('http://localhost:9090/events/getCategory')
     if (response.data && Array.isArray(response.data)) {
       const categories = response.data.map(item => ({
         text: item.category,
@@ -232,7 +232,7 @@ const fetchData = async (resetPage = false) => {
     if (eventCategory.value) params.eventCategory = eventCategory.value
     if (statusFilter.value !== '') params.status = statusFilter.value
 
-    const response = await axios.post('http://localhost:9091/disputes/list', params)
+    const response = await axios.post('http://localhost:9090/disputes/list', params)
 
     disputes.value = response.data.list
     total.value = response.data.total
