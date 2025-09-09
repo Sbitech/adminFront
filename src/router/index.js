@@ -84,6 +84,21 @@ const router = createRouter({
           path: 'notification',
           name: 'notification',
           component: () => import('../views/notification/index.vue')
+        },
+        {
+          path: 'permission',
+          name: 'permission',
+          component: () => import('../views/permission/index.vue')
+        },
+        {
+          path: 'scoring-rules',
+          name: 'scoring-rules',
+          component: () => import('../views/scoring-rules/index.vue')
+        },
+        {
+          path: 'rule-library',
+          name: 'rule-library',
+          component: () => import('../views/rule-library/index.vue')
         }
       ]
     }

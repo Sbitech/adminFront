@@ -78,7 +78,47 @@
           to="/dispute"
           exact
         ></v-list-item>
-        <!-- 消息通知导航项已删除，仅通过右上角铃铛图标进入 -->
+        <v-list-item 
+          prepend-icon="mdi-bell" 
+          title="消息通知" 
+          value="notification" 
+          to="/notification"
+          exact
+        ></v-list-item>
+        <v-list-group value="permission" fluid>
+          <template v-slot:activator="{ props }">
+            <v-list-item
+              prepend-icon="mdi-shield-account"
+              title="权限与规则"
+              v-bind="props"
+            ></v-list-item>
+          </template>
+          
+          <v-list-item
+            prepend-icon="mdi-account-key"
+            title="权限配置"
+            value="permission-config"
+            to="/permission"
+            exact
+            style="padding-left: 32px !important;"
+          ></v-list-item>
+          <v-list-item
+            prepend-icon="mdi-tune-variant"
+            title="评分规则"
+            value="scoring-rules"
+            to="/scoring-rules"
+            exact
+            style="padding-left: 32px !important;"
+          ></v-list-item>
+          <v-list-item
+            prepend-icon="mdi-book-open-variant"
+            title="规则库"
+            value="rule-library"
+            to="/rule-library"
+            exact
+            style="padding-left: 32px !important;"
+          ></v-list-item>
+        </v-list-group>
       </v-list>
 
       <template v-slot:append>
@@ -178,16 +218,6 @@
           </v-card-text>
 
           <v-divider v-if="notifications.length > 0"></v-divider>
-
-          <v-card-actions v-if="notifications.length > 0">
-            <v-btn
-              variant="text"
-              color="primary"
-              @click="viewAllNotifications"
-            >
-              查看全部
-            </v-btn>
-          </v-card-actions>
         </v-card>
       </v-menu>
       

@@ -48,7 +48,7 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import axios from '@/api/axios'
 import { VIcon } from 'vuetify/components'
 
 // 定义表单数据

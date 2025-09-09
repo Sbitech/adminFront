@@ -268,7 +268,7 @@
 <script>
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import axios from 'axios'
+import axios from '@/api/axios'
 
 export default {
   name: 'DisputeDetail',
@@ -376,18 +376,8 @@ export default {
           params.append('score', newScore.value.toString())
         }
 
-        const response = await fetch(`http://localhost:9090/disputes/update/${disputeDetail.value.id}?${params.toString()}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          }
-        })
-
-        if (!response.ok) {
-          throw new Error('处理争议失败')
-        }
-
-        const result = await response.json()
+        const response = await axios.put(`http://localhost:9090/disputes/update/${disputeDetail.value.id}?${params.toString()}`)
+        const result = response.data
 
         // 显示成功消息
         alert('争议处理成功！')
