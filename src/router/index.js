@@ -50,16 +50,7 @@ const router = createRouter({
           name: 'replay',
           component: () => import('../views/replay/index.vue')
         },
-        {
-          path: 'ai-score',
-          name: 'ai-score',
-          component: () => import('../views/ai-score/index.vue')
-        },
-        {
-          path: 'manual-score',
-          name: 'manual-score',
-          component: () => import('../views/manual-score/index.vue')
-        },
+        // AI评分和人工评分功能已整合到实时回放页面
         {
           path: 'backup',
           name: 'backup',

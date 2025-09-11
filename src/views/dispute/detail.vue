@@ -263,6 +263,26 @@
       </v-col>
     </v-row>
   </v-container>
+
+  <!-- Snackbar提示消息 -->
+  <v-snackbar
+    v-model="snackbar.show"
+    :color="snackbar.color"
+    :timeout="snackbar.timeout"
+    location="top"
+    position="absolute"
+  >
+    {{ snackbar.message }}
+    <template v-slot:actions>
+      <v-btn
+        color="white"
+        variant="text"
+        @click="snackbar.show = false"
+      >
+        关闭
+      </v-btn>
+    </template>
+  </v-snackbar>
 </template>
 
 <script>
@@ -296,6 +316,12 @@ export default {
     const reviewOpinion = ref('')
     const submitting = ref(false)
     const actionOptions = ['驳回', '处理争议']
+    const snackbar = ref({
+      show: false,
+      message: '',
+      color: 'success',
+      timeout: 3000
+    })
 
     const loadDisputeDetail = async () => {
       const id = route.params.id
@@ -380,7 +406,12 @@ export default {
         const result = response.data
 
         // 显示成功消息
-        alert('争议处理成功！')
+        snackbar.value = {
+          show: true,
+          message: '争议处理成功！',
+          color: 'success',
+          timeout: 3000
+        }
 
         // 重新加载争议详情
         await loadDisputeDetail()
@@ -390,7 +421,12 @@ export default {
 
       } catch (error) {
         console.error('处理争议失败:', error)
-        alert('处理争议失败，请重试！')
+        snackbar.value = {
+          show: true,
+          message: '处理争议失败，请重试！',
+          color: 'error',
+          timeout: 3000
+        }
       } finally {
         submitting.value = false
       }
@@ -423,7 +459,8 @@ export default {
       actionOptions,
       submitDispute,
       resetForm,
-      disputeForm
+      disputeForm,
+      snackbar
     }
   }
 }</script>

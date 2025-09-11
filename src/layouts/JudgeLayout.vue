@@ -37,20 +37,6 @@
           exact
         ></v-list-item>
         <v-list-item 
-          prepend-icon="mdi-robot" 
-          title="AI评分明细" 
-          value="ai-score" 
-          to="/ai-score"
-          exact
-        ></v-list-item>
-        <v-list-item 
-          prepend-icon="mdi-account-edit" 
-          title="人工评分干预" 
-          value="manual-score" 
-          to="/manual-score"
-          exact
-        ></v-list-item>
-        <v-list-item 
           prepend-icon="mdi-database" 
           title="数据备份" 
           value="backup" 

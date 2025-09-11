@@ -84,7 +84,8 @@
       v-model="snackbar.show"
       :color="snackbar.color"
       :timeout="3000"
-      location="top right"
+      location="top"
+      position="absolute"
     >
       {{ snackbar.message }}
       <template v-slot:actions>

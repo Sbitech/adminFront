@@ -33,7 +33,118 @@
               </v-col>
             </v-row>
 
+<!-- 第一行：动作控制 + 主视频 + 比赛场次 -->
             <v-row>
+              <!-- 左侧动作控制器和视角预览 -->
+              <v-col cols="12" lg="2" class="d-flex flex-column">
+                <v-card class="flex-grow-1 d-flex flex-column" style="min-height: 200px;">
+                  <v-card-title class="text-subtitle-1">
+                    <v-icon left>mdi-controller</v-icon>
+                    动作控制
+                  </v-card-title>
+                  <v-card-text class="flex-grow-1 d-flex flex-column justify-center">
+                    <div class="text-center mb-4">
+                      <div class="text-h6">{{ actionTimestamps[currentActionIndex]?.name || '准备动作' }}</div>
+                      <div class="text-caption">{{ formatTime(actionTimestamps[currentActionIndex]?.start || 0) }} - {{ formatTime(actionTimestamps[currentActionIndex]?.end || 0) }}</div>
+                      <div class="text-caption">第 {{ currentActionIndex + 1 }} / {{ actionTimestamps.length }} 个动作</div>
+                    </div>
+                    <div class="d-flex flex-column gap-2">
+                      <v-btn color="primary" prepend-icon="mdi-skip-previous" @click="previousAction" :disabled="currentActionIndex <= 0" block>
+                        上一个动作
+                      </v-btn>
+                      <v-btn color="primary" prepend-icon="mdi-skip-next" @click="nextAction" :disabled="currentActionIndex >= actionTimestamps.length - 1" block>
+                        下一个动作
+                      </v-btn>
+                      <v-btn color="secondary" prepend-icon="mdi-play" @click="playCurrentAction" block>
+                        播放当前
+                      </v-btn>
+                    </div>
+                  </v-card-text>
+                </v-card>
+
+                <!-- 视角预览区域 -->
+                <v-card class="flex-grow-1 mt-3">
+                  <v-card-title class="text-subtitle-2">
+                    <v-icon left>mdi-eye</v-icon>
+                    视角预览
+                  </v-card-title>
+                  <v-card-text>
+                    <v-row no-gutters class="justify-center">
+                      <v-col cols="12" class="mb-2">
+                        <v-card 
+                          :class="['perspective-card', { 'active': currentPerspective === 'front' }]"
+                          @click="switchPerspective('front')"
+                          class="text-center cursor-pointer"
+                          style="aspect-ratio: 16/9; max-height: 80px;"
+                        >
+                          <video 
+                            v-if="selectedMatch?.videoFront" 
+                            ref="frontVideo"
+                            :src="selectedMatch.videoFront" 
+                            muted 
+                            autoplay
+                            loop
+                            class="perspective-video"
+                            @loadedmetadata="onPerspectiveLoaded"
+                          ></video>
+                          <div v-else class="d-flex flex-column align-center justify-center" style="height: 100%;">
+                            <v-icon color="grey" size="small">mdi-video-account</v-icon>
+                            <span class="text-caption">正面</span>
+                          </div>
+                        </v-card>
+                      </v-col>
+                      <v-col cols="12" class="mb-2">
+                        <v-card 
+                          :class="['perspective-card', { 'active': currentPerspective === 'side' }]"
+                          @click="switchPerspective('side')"
+                          class="text-center cursor-pointer"
+                          style="aspect-ratio: 16/9; max-height: 80px;"
+                        >
+                          <video 
+                            v-if="selectedMatch?.videoSide" 
+                            ref="sideVideo"
+                            :src="selectedMatch.videoSide" 
+                            muted 
+                            autoplay
+                            loop
+                            class="perspective-video"
+                            @loadedmetadata="onPerspectiveLoaded"
+                          ></video>
+                          <div v-else class="d-flex flex-column align-center justify-center" style="height: 100%;">
+                            <v-icon color="grey" size="small">mdi-video-account</v-icon>
+                            <span class="text-caption">侧面</span>
+                          </div>
+                        </v-card>
+                      </v-col>
+                      <v-col cols="12">
+                        <v-card 
+                          :class="['perspective-card', { 'active': currentPerspective === 'back' }]"
+                          @click="switchPerspective('back')"
+                          class="text-center cursor-pointer"
+                          style="aspect-ratio: 16/9; max-height: 80px;"
+                        >
+                          <video 
+                            v-if="selectedMatch?.videoBack" 
+                            ref="backVideo"
+                            :src="selectedMatch.videoBack" 
+                            muted 
+                            autoplay
+                            loop
+                            class="perspective-video"
+                            @loadedmetadata="onPerspectiveLoaded"
+                          ></video>
+                          <div v-else class="d-flex flex-column align-center justify-center" style="height: 100%;">
+                            <v-icon color="grey" size="small">mdi-video-account</v-icon>
+                            <span class="text-caption">背面</span>
+                          </div>
+                        </v-card>
+                      </v-col>
+                    </v-row>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+
+              <!-- 中间主视频区域 -->
               <v-col cols="12" lg="8">
                 <v-card class="video-player" style="aspect-ratio: 16/9; max-height: 600px;">
                   <!-- 主视频窗口 -->
@@ -56,89 +167,10 @@
                     <p>请选择比赛场次开始观看</p>
                   </v-card-text>
                 </v-card>
-                
-                <!-- 视角切换窗口 -->
-                <v-card v-if="selectedMatch" class="mt-3" style="background-color: #f5f5f5;">
-                  <v-card-text class="pa-3">
-                    <div class="text-subtitle-2 mb-2 text-center">
-                      视角切换 - {{ getPerspectiveName(currentPerspective) }}
-                    </div>
-                    <v-row no-gutters class="justify-center">
-                      <v-col cols="4" class="pa-1">
-                        <v-card 
-                          :class="['perspective-card', { 'active': currentPerspective === 'front' }]"
-                          @click="switchPerspective('front')"
-                          class="text-center cursor-pointer"
-                          style="aspect-ratio: 16/9; max-height: 100px;"
-                        >
-                          <video 
-                            v-if="selectedMatch.videoFront" 
-                            ref="frontVideo"
-                            :src="selectedMatch.videoFront" 
-                            muted 
-                            autoplay
-                            loop
-                            class="perspective-video"
-                            @loadedmetadata="onPerspectiveLoaded"
-                          ></video>
-                          <div v-else class="d-flex flex-column align-center justify-center" style="height: 100%;">
-                            <v-icon color="grey">mdi-video-account</v-icon>
-                            <span class="text-caption">正面</span>
-                          </div>
-                        </v-card>
-                      </v-col>
-                      <v-col cols="4" class="pa-1">
-                        <v-card 
-                          :class="['perspective-card', { 'active': currentPerspective === 'side' }]"
-                          @click="switchPerspective('side')"
-                          class="text-center cursor-pointer"
-                          style="aspect-ratio: 16/9; max-height: 100px;"
-                        >
-                          <video 
-                            v-if="selectedMatch.videoSide" 
-                            ref="sideVideo"
-                            :src="selectedMatch.videoSide" 
-                            muted 
-                            autoplay
-                            loop
-                            class="perspective-video"
-                            @loadedmetadata="onPerspectiveLoaded"
-                          ></video>
-                          <div v-else class="d-flex flex-column align-center justify-center" style="height: 100%;">
-                            <v-icon color="grey">mdi-video-account</v-icon>
-                            <span class="text-caption">侧面</span>
-                          </div>
-                        </v-card>
-                      </v-col>
-                      <v-col cols="4" class="pa-1">
-                        <v-card 
-                          :class="['perspective-card', { 'active': currentPerspective === 'back' }]"
-                          @click="switchPerspective('back')"
-                          class="text-center cursor-pointer"
-                          style="aspect-ratio: 16/9; max-height: 100px;"
-                        >
-                          <video 
-                            v-if="selectedMatch.videoBack" 
-                            ref="backVideo"
-                            :src="selectedMatch.videoBack" 
-                            muted 
-                            autoplay
-                            loop
-                            class="perspective-video"
-                            @loadedmetadata="onPerspectiveLoaded"
-                          ></video>
-                          <div v-else class="d-flex flex-column align-center justify-center" style="height: 100%;">
-                            <v-icon color="grey">mdi-video-account</v-icon>
-                            <span class="text-caption">背面</span>
-                          </div>
-                        </v-card>
-                      </v-col>
-                    </v-row>
-                  </v-card-text>
-                </v-card>
               </v-col>
 
-              <v-col cols="12" lg="4">
+              <!-- 右侧比赛场次 -->
+              <v-col cols="12" lg="2">
                 <v-card class="match-list" max-height="600" style="overflow-y: auto;">
                   <v-card-title class="sticky-title">
                     比赛场次
@@ -170,11 +202,281 @@
                   </v-card-text>
                 </v-card>
               </v-col>
+
+            <!-- 第二行：AI评分部分 -->
+            <v-row class="mt-4">
+              <v-col cols="12">
+                <v-card>
+                  <v-card-title class="text-h6">
+                    <v-icon left>mdi-chart-line</v-icon>
+                    AI评分分析
+                  </v-card-title>
+                  <v-card-text>
+                    <v-row>
+                      <!-- AI评分卡片 -->
+                      <v-col cols="12" lg="2">
+                        <v-card class="score-display">
+                          <v-card-title class="text-subtitle-2 text-center" style="color: black;">
+                            <v-icon left>mdi-star-circle</v-icon>
+                            AI评分
+                          </v-card-title>
+                          
+                          <v-card-text class="pa-3">
+                            <v-card class="score-card total-score mb-2" elevation="1">
+                              <div class="score-label">综合</div>
+                              <div class="score-value">{{ ((aiScores.difficulty + aiScores.fluidity + aiScores.appearance) / 3).toFixed(1) }}</div>
+                            </v-card>
+                            <v-card class="score-card difficulty-score mb-2" elevation="1">
+                              <div class="score-label">难度</div>
+                              <div class="score-value">{{ aiScores.difficulty }}</div>
+                            </v-card>
+                            <v-card class="score-card flow-score mb-2" elevation="1">
+                              <div class="score-label">流畅</div>
+                              <div class="score-value">{{ aiScores.fluidity }}</div>
+                            </v-card>
+                            <v-card class="score-card appearance-score mb-2" elevation="1">
+                              <div class="score-label">服饰</div>
+                              <div class="score-value">{{ aiScores.appearance }}</div>
+                            </v-card>
+                          </v-card-text>
+                        </v-card>
+                      </v-col>
+
+                      <!-- 动作细节评分分析 -->
+                      <v-col cols="12" lg="10">
+                        <v-card elevation="2" class="bg-white">
+                          <v-card-title class="text-subtitle-2" style="color: black;">
+                            <v-icon left>mdi-magnify</v-icon>
+                            动作细节评分分析
+                          </v-card-title>
+                          <v-card-text class="pa-4">
+                            <v-row>
+                              <!-- 左侧招式列表 -->
+                              <v-col cols="12" md="3" lg="2">
+                                <v-card elevation="1" class="h-100 bg-white">
+                                  <v-card-title class="text-subtitle-2 text-center" style="color: black;">
+                                    招式列表
+                                  </v-card-title>
+                                  <v-card-text class="pa-2">
+                                    <v-list density="compact" class="bg-white">
+                                      <v-list-item
+                                        v-for="(action, index) in actionDetails"
+                                        :key="index"
+                                        :class="['cursor-pointer rounded', { 
+                                          'bg-blue-lighten-4 elevation-2': selectedActionIndex === index,
+                                          'hover-bg-blue-lighten-5': selectedActionIndex !== index
+                                        }]"
+                                        @click="selectAction(index)"
+                                        class="mb-2 transition-all"
+                                        style="transition: all 0.2s ease"
+                                      >
+                                        <v-list-item-title class="text-body-2 font-weight-medium">
+                                          {{ action.name }}
+                                        </v-list-item-title>
+                                        <v-list-item-subtitle class="mt-1">
+                                          <v-chip :color="getScoreColor(action.score)" size="small" variant="flat">
+                                            {{ action.score }}/10
+                                          </v-chip>
+                                        </v-list-item-subtitle>
+                                      </v-list-item>
+                                    </v-list>
+                                  </v-card-text>
+                                </v-card>
+                              </v-col>
+                              
+                              <!-- 右侧评分详情 -->
+                              <v-col cols="12" md="9" lg="10">
+                                <v-card elevation="1" class="h-100 bg-white">
+                                  <v-card-text v-if="selectedAction" class="pa-4">
+                                    <v-row>
+                                      <v-col cols="12">
+                                        <div class="text-h5 font-weight-bold mb-2" style="color: black;">{{ selectedAction.name }}</div>
+                                        <v-divider class="mb-4"></v-divider>
+                                      </v-col>
+                                    </v-row>
+                                    
+                                    <v-row>
+                                      <!-- 技术评分 -->
+                                      <v-col cols="12" md="6" lg="3">
+                                        <v-card elevation="1" class="pa-3 h-100 bg-white">
+                                          <div class="text-subtitle-2 font-weight-bold mb-2 text-center" style="color: black;">技术评分</div>
+                                          <div class="d-flex justify-space-between align-center mb-1">
+                                            <span class="text-body-2" style="color: black;">动作难度</span>
+                                            <span class="text-body-2 font-weight-medium" style="color: black;">{{ selectedAction.difficulty }}</span>
+                                          </div>
+                                          <v-progress-linear
+                                            :model-value="selectedAction.difficulty * 10"
+                                            color="primary"
+                                            height="8"
+                                            class="mb-3"
+                                          ></v-progress-linear>
+                                          
+                                          <div class="d-flex justify-space-between align-center mb-1">
+                                            <span class="text-body-2" style="color: black;">执行质量</span>
+                                            <span class="text-body-2 font-weight-medium" style="color: black;">{{ selectedAction.execution }}</span>
+                                          </div>
+                                          <v-progress-linear
+                                            :model-value="selectedAction.execution * 10"
+                                            color="primary"
+                                            height="8"
+                                          ></v-progress-linear>
+                                        </v-card>
+                                      </v-col>
+                                      
+                                      <!-- 表现评分 -->
+                                      <v-col cols="12" md="6" lg="3">
+                                        <v-card class="elevation-1 mb-3">
+                                          <v-card-title class="text-subtitle-2 pa-3" style="color: black;">
+                                            表现评分
+                                          </v-card-title>
+                                          <v-card-text class="pa-3" style="color: black;">
+                                            <div class="mb-3">
+                                              <div class="d-flex justify-space-between mb-1">
+                                                <span class="text-body-2" style="color: black;">动作幅度</span>
+                                                <span class="text-body-2" style="color: black;">{{ selectedAction.amplitude }}/10</span>
+                                              </div>
+                                              <v-progress-linear
+                                                :model-value="selectedAction.amplitude * 10"
+                                                color="primary"
+                                                height="8"
+                                              ></v-progress-linear>
+                                            </div>
+                                            <div class="mb-3">
+                                              <div class="d-flex justify-space-between mb-1">
+                                                <span class="text-body-2" style="color: black;">落地稳定</span>
+                                                <span class="text-body-2" style="color: black;">{{ selectedAction.landing }}/10</span>
+                                              </div>
+                                              <v-progress-linear
+                                                :model-value="selectedAction.landing * 10"
+                                                color="primary"
+                                                height="8"
+                                              ></v-progress-linear>
+                                            </div>
+                                            <div>
+                                              <div class="d-flex justify-space-between mb-1">
+                                                <span class="text-body-2" style="color: black;">节奏控制</span>
+                                                <span class="text-body-2" style="color: black;">{{ selectedAction.timing }}/10</span>
+                                              </div>
+                                              <v-progress-linear
+                                                :model-value="selectedAction.timing * 10"
+                                                color="primary"
+                                                height="8"
+                                              ></v-progress-linear>
+                                            </div>
+                                          </v-card-text>
+                                        </v-card>
+                                      </v-col>
+                                      
+                                      <!-- AI评语 -->
+                                      <v-col cols="12" md="12" lg="6">
+                                        <v-card elevation="1" class="pa-3 h-100 bg-white">
+                                          <div class="text-subtitle-2 font-weight-bold mb-2 text-center" style="color: black;">AI评语</div>
+                                          <v-list density="compact" class="bg-transparent">
+                                            <v-list-item
+                                              v-for="(comment, cIndex) in selectedAction.comments"
+                                              :key="cIndex"
+                                              class="mb-1 text-body-2"
+                                              style="color: black;"
+                                            >
+                                              • {{ comment }}
+                                            </v-list-item>
+                                          </v-list>
+                                        </v-card>
+                                      </v-col>
+                                    </v-row>
+                                  </v-card-text>
+                                  
+                                  <v-card-text v-else class="d-flex align-center justify-center" style="height: 300px;">
+                                    <div class="text-center">
+                                      <v-icon size="64" color="primary" class="mb-4">mdi-gesture-tap</v-icon>
+                                      <div class="text-h6 font-weight-medium" style="color: black;">请选择招式</div>
+                                      <div class="text-body-2" style="color: black;">点击左侧招式查看详细评分分析</div>
+                                    </div>
+                                  </v-card-text>
+                                </v-card>
+                              </v-col>
+                            </v-row>
+                          </v-card-text>
+                        </v-card>
+                      </v-col>
+                    </v-row>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
+
+            
             </v-row>
           </v-card-text>
         </v-card>
       </v-col>
     </v-row>
+
+    <!-- 评分调整对话框 -->
+    <v-dialog v-model="showScoreAdjustment" max-width="500px">
+      <v-card>
+        <v-card-title>
+          <v-icon left>mdi-pencil-ruler</v-icon>
+          人工评分调整
+        </v-card-title>
+        <v-card-text>
+          <v-form>
+            <v-row>
+              <v-col cols="12">
+                <v-slider
+                  v-model="manualAdjustment.difficulty"
+                  label="动作难度分"
+                  min="0"
+                  max="10"
+                  step="0.1"
+                  thumb-label
+                  color="primary"
+                ></v-slider>
+              </v-col>
+              <v-col cols="12">
+                <v-slider
+                  v-model="manualAdjustment.fluidity"
+                  label="动作流畅分"
+                  min="0"
+                  max="10"
+                  step="0.1"
+                  thumb-label
+                  color="success"
+                ></v-slider>
+              </v-col>
+              <v-col cols="12">
+                <v-slider
+                  v-model="manualAdjustment.appearance"
+                  label="服饰评分"
+                  min="0"
+                  max="10"
+                  step="0.1"
+                  thumb-label
+                  color="info"
+                ></v-slider>
+              </v-col>
+              <v-col cols="12">
+                <v-textarea
+                  v-model="manualAdjustment.reason"
+                  label="调整原因"
+                  rows="3"
+                  variant="outlined"
+                ></v-textarea>
+              </v-col>
+            </v-row>
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="grey" variant="text" @click="cancelScoreAdjustment">
+            取消
+          </v-btn>
+          <v-btn color="primary" variant="text" @click="saveScoreAdjustment">
+            保存调整
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -192,6 +494,87 @@ const selectedMatch = ref(null)
 
 // 当前视角
 const currentPerspective = ref('front')
+
+// AI评分数据
+const aiScores = ref({
+  difficulty: 8.5,
+  fluidity: 7.8,
+  appearance: 9.2
+})
+
+// 动作细节评分
+const actionDetails = ref([
+  {
+    name: '腾空摆莲720°',
+    score: 8.8,
+    difficulty: 9.2,
+    execution: 8.5,
+    amplitude: 8.7,
+    landing: 8.8,
+    timing: 9.0,
+    comments: ['旋转角度完整', '空中姿态优美', '落地稳定性好']
+  },
+  {
+    name: '旋风脚360°',
+    score: 7.9,
+    difficulty: 7.5,
+    execution: 8.2,
+    amplitude: 8.0,
+    landing: 7.8,
+    timing: 8.0,
+    comments: ['转体速度略慢', '空中分腿不够充分', '落地有轻微晃动']
+  },
+  {
+    name: '侧空翻',
+    score: 8.5,
+    difficulty: 8.0,
+    execution: 8.8,
+    amplitude: 8.5,
+    landing: 8.2,
+    timing: 8.5,
+    comments: ['空中姿态控制良好', '翻转速度适中', '落地重心略偏']
+  },
+  {
+    name: '后手翻',
+    score: 8.2,
+    difficulty: 7.8,
+    execution: 8.5,
+    amplitude: 8.0,
+    landing: 8.0,
+    timing: 8.5,
+    comments: ['手部支撑有力', '身体线条流畅', '动作连贯性好']
+  },
+  {
+    name: '鲤鱼打挺',
+    score: 9.0,
+    difficulty: 8.5,
+    execution: 9.2,
+    amplitude: 8.8,
+    landing: 9.0,
+    timing: 9.5,
+    comments: ['爆发力出色', '动作干净利落', '节奏感强']
+  }
+])
+
+// 动作跳转相关数据
+const currentActionIndex = ref(0)
+const actionTimestamps = ref([
+  { start: 0, end: 5, name: '准备动作' },
+  { start: 5, end: 12, name: '腾空摆莲720°' },
+  { start: 12, end: 18, name: '旋风脚360°' },
+  { start: 18, end: 25, name: '侧空翻' },
+  { start: 25, end: 32, name: '后手翻' },
+  { start: 32, end: 40, name: '鲤鱼打挺' }
+])
+
+// 评分调整对话框
+const showScoreAdjustment = ref(false)
+const manualAdjustment = ref({
+  difficulty: 0,
+  fluidity: 0,
+  appearance: 0,
+  reason: ''
+})
 
 // 当前视频地址
 const currentVideoUrl = computed(() => {
@@ -510,6 +893,102 @@ const resetFilters = () => {
 const handleVideoError = () => {
   console.error('视频加载失败，请检查视频路径')
 }
+
+// 获取分数颜色
+const getScoreColor = (score) => {
+  if (score >= 9) return 'success'
+  if (score >= 7) return 'warning'
+  return 'error'
+}
+
+// 打开评分调整对话框
+const openScoreAdjustment = () => {
+  manualAdjustment.value = {
+    difficulty: aiScores.value.difficulty,
+    fluidity: aiScores.value.fluidity,
+    appearance: aiScores.value.appearance,
+    reason: ''
+  }
+  showScoreAdjustment.value = true
+}
+
+// 保存评分调整
+const saveScoreAdjustment = () => {
+  aiScores.value.difficulty = manualAdjustment.value.difficulty
+  aiScores.value.fluidity = manualAdjustment.value.fluidity
+  aiScores.value.appearance = manualAdjustment.value.appearance
+  
+  console.log('评分已调整:', manualAdjustment.value)
+  showScoreAdjustment.value = false
+  
+  // 这里可以添加API调用保存调整记录
+}
+
+// 取消评分调整
+const cancelScoreAdjustment = () => {
+  showScoreAdjustment.value = false
+  manualAdjustment.value = {
+    difficulty: aiScores.value.difficulty,
+    fluidity: aiScores.value.fluidity,
+    appearance: aiScores.value.appearance,
+    reason: ''
+  }
+}
+
+// 展开/收起动作详情
+const expandedActions = ref([])
+const toggleActionDetail = (index) => {
+  const idx = expandedActions.value.indexOf(index)
+  if (idx > -1) {
+    expandedActions.value.splice(idx, 1)
+  } else {
+    expandedActions.value.push(index)
+  }
+}
+const isActionExpanded = (index) => expandedActions.value.includes(index)
+
+// 选择动作详情
+const selectedActionIndex = ref(0)
+const selectedAction = computed(() => actionDetails.value[selectedActionIndex.value])
+
+const selectAction = (index) => {
+  selectedActionIndex.value = index
+}
+
+// 格式化时间（秒 → mm:ss）
+const formatTime = (seconds) => {
+  const mins = Math.floor(seconds / 60)
+  const secs = Math.floor(seconds % 60)
+  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+}
+
+// 动作跳转方法
+const previousAction = () =>{
+  if (currentActionIndex.value > 0) {
+    currentActionIndex.value--
+    jumpToAction()
+  }
+}
+
+const nextAction = () => {
+  if (currentActionIndex.value < actionTimestamps.value.length - 1) {
+    currentActionIndex.value++
+    jumpToAction()
+  }
+}
+
+const playCurrentAction = () => {
+  jumpToAction()
+  mainVideo.value?.play()
+}
+
+const jumpToAction = () => {
+  const action = actionTimestamps.value[currentActionIndex.value]
+  if (action && mainVideo.value) {
+    mainVideo.value.currentTime = action.start
+    mainVideo.value.play()
+  }
+}
 </script>
 
 <style scoped>
@@ -614,5 +1093,50 @@ const handleVideoError = () => {
 
 .cursor-pointer {
   cursor: pointer;
+}
+
+/* AI评分卡片样式 */
+.score-card {
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.score-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.score-display {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.score-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #1976d2;
+}
+
+.score-max {
+  font-size: 1rem;
+  color: #666;
+  margin-left: 4px;
+}
+
+.action-item {
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.difficulty-score .score-value {
+  color: #1976d2;
+}
+
+.fluidity-score .score-value {
+  color: #4caf50;
+}
+
+.appearance-score .score-value {
+  color: #2196f3;
 }
 </style>

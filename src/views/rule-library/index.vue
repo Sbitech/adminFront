@@ -105,6 +105,14 @@
                   class="mr-1"
                 ></v-btn>
                 <v-btn
+                  icon="mdi-pencil"
+                  variant="text"
+                  color="warning"
+                  size="small"
+                  @click="openStatusDialog(item)"
+                  class="mr-1"
+                ></v-btn>
+                <v-btn
                   icon="mdi-delete"
                   variant="text"
                   color="error"
@@ -272,12 +280,46 @@
       </v-card>
     </v-dialog>
 
+    <!-- 状态修改对话框 -->
+    <v-dialog v-model="statusDialog" max-width="400">
+      <v-card>
+        <v-card-title class="d-flex align-center">
+          <v-icon color="#42b883" class="mr-2">mdi-pencil</v-icon>
+          修改规则状态
+        </v-card-title>
+        <v-card-text>
+          <div class="text-body-1 mb-4">
+            当前规则：{{ ruleToUpdateStatus?.name }}
+          </div>
+          <v-select
+            v-model="newStatus"
+            :items="statusOptions"
+            label="选择新状态"
+            variant="outlined"
+            density="comfortable"
+          ></v-select>
+        </v-card-text>
+        <v-card-actions class="pa-4">
+          <v-spacer></v-spacer>
+          <v-btn color="grey" variant="text" @click="closeStatusDialog">取消</v-btn>
+          <v-btn
+            color="#42b883"
+            variant="elevated"
+            @click="updateRuleStatus"
+          >
+            确认修改
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <!-- 提示消息 -->
     <v-snackbar
       v-model="snackbar.show"
       :color="snackbar.color"
       :timeout="3000"
-      location="top right"
+      location="top"
+      position="absolute"
     >
       {{ snackbar.message }}
       <template v-slot:actions>
@@ -351,6 +393,10 @@ export default {
       message: '',
       color: 'success'
     })
+    
+    const statusDialog = ref(false)
+    const ruleToUpdateStatus = ref(null)
+    const newStatus = ref('')
     
     const filteredRules = computed(() => {
       let result = rules.value
@@ -502,6 +548,37 @@ export default {
       }
     }
     
+    const openStatusDialog = (rule) => {
+      ruleToUpdateStatus.value = rule
+      newStatus.value = rule.status
+      statusDialog.value = true
+    }
+    
+    const closeStatusDialog = () => {
+      statusDialog.value = false
+      ruleToUpdateStatus.value = null
+      newStatus.value = ''
+    }
+    
+    const updateRuleStatus = async () => {
+      if (!ruleToUpdateStatus.value || !newStatus.value) return
+      
+      try {
+        // 模拟API调用
+        await new Promise(resolve => setTimeout(resolve, 800))
+        
+        const index = rules.value.findIndex(r => r.id === ruleToUpdateStatus.value.id)
+        if (index > -1) {
+          rules.value[index].status = newStatus.value
+        }
+        
+        showSnackbar('规则状态更新成功', 'success')
+        closeStatusDialog()
+      } catch (error) {
+        showSnackbar('规则状态更新失败', 'error')
+      }
+    }
+    
     const getStatusColor = (status) => {
       const colorMap = {
         active: 'success',
@@ -538,6 +615,7 @@ export default {
       importDialog,
       detailDialog,
       deleteDialog,
+      statusDialog,
       importFormValid,
       importing,
       deleting,
@@ -548,6 +626,8 @@ export default {
       importFile,
       selectedRule,
       ruleToDelete,
+      ruleToUpdateStatus,
+      newStatus,
       rules,
       categories,
       statusOptions,
@@ -562,6 +642,9 @@ export default {
       downloadRule,
       confirmDelete,
       deleteRule,
+      openStatusDialog,
+      closeStatusDialog,
+      updateRuleStatus,
       getStatusColor,
       getStatusText,
       formatDateTime
