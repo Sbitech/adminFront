@@ -2,7 +2,7 @@
   <v-container fluid class="report-container">
 
     <v-row>
-      <v-col cols="12" lg="8">
+      <v-col cols="12" lg="5">
         <v-card class="report-card">
           <v-card-title>
             <v-icon left>mdi-file-document</v-icon>
@@ -105,24 +105,63 @@
         </v-card>
       </v-col>
       
-      <v-col cols="12" lg="4">
+      <v-col cols="12" lg="7">
         <!-- 历史报告 -->
         <v-card class="report-history">
           <v-card-title>
             <v-icon left>mdi-history</v-icon>
             历史报告
-            <v-chip small color="#42b883" class="ml-2">{{ reports.length }}</v-chip>
+            <v-chip small color="#42b883" class="ml-2">{{ filteredReports.length }}</v-chip>
           </v-card-title>
           <v-card-text>
+            <!-- 高级筛选功能 -->
+            <v-row dense class="mb-3">
+              <v-col cols="12" md="6">
+                <v-text-field
+                  v-model="searchQuery"
+                  label="搜索报告"
+                  prepend-inner-icon="mdi-magnify"
+                  variant="outlined"
+                  density="compact"
+                  clearable
+                  hide-details
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" md="3">
+                <v-select
+                  v-model="filterType"
+                  label="文件类型"
+                  :items="['全部', 'PDF', 'Excel', 'Word']"
+                  variant="outlined"
+                  density="compact"
+                  hide-details
+                ></v-select>
+              </v-col>
+              <v-col cols="12" md="3">
+                <v-select
+                  v-model="sortOrder"
+                  label="排序方式"
+                  :items="['最新优先', '最旧优先', '名称升序', '名称降序']"
+                  variant="outlined"
+                  density="compact"
+                  hide-details
+                ></v-select>
+              </v-col>
+            </v-row>
+            
             <v-list density="compact">
               <v-list-item
-                v-for="report in reports"
+                v-for="report in filteredReports"
                 :key="report.id"
                 class="report-item"
               >
                 <template v-slot:prepend>
-                  <v-icon :color="report.type === 'PDF' ? '#ff5252' : '#2196f3'">
-                    {{ report.type === 'PDF' ? 'mdi-file-pdf' : 'mdi-file-excel' }}
+                  <v-icon 
+                    :color="report.type === 'PDF' ? '#e74c3c' : report.type === 'Excel' ? '#27ae60' : '#3498db'"
+                    size="28"
+                  >
+                    {{ report.type === 'PDF' ? 'mdi-file-document' : 
+                       report.type === 'Excel' ? 'mdi-file-table' : 'mdi-file-word' }}
                   </v-icon>
                 </template>
                 
@@ -144,9 +183,23 @@
               </v-list-item>
             </v-list>
             
-            <div v-if="reports.length === 0" class="text-center pa-4">
-              <v-icon size="48" color="grey">mdi-file-document-outline</v-icon>
-              <p class="text-grey mt-2">暂无报告</p>
+            <div v-if="filteredReports.length === 0" class="text-center pa-4">
+              <v-icon size="48" color="grey">
+                {{ searchQuery ? 'mdi-file-search-outline' : 'mdi-file-document-outline' }}
+              </v-icon>
+              <p class="text-grey mt-2">
+                {{ searchQuery ? `未找到包含 "${searchQuery}" 的报告` : '暂无报告' }}
+              </p>
+              <v-btn 
+                v-if="searchQuery" 
+                variant="text" 
+                color="primary" 
+                size="small" 
+                @click="searchQuery = ''"
+                class="mt-2"
+              >
+                清空搜索
+              </v-btn>
             </div>
           </v-card-text>
         </v-card>
@@ -244,7 +297,45 @@ const generatedReportInfo = ref(null)
 // 预览数据
 const previewData = ref(null)
 
+// 搜索和筛选功能
+const searchQuery = ref('')
+const filterType = ref('全部')
+const sortOrder = ref('最新优先')
 
+// 筛选后的报告列表
+const filteredReports = computed(() => {
+  let filtered = reports.value
+  
+  // 类型筛选
+  if (filterType.value !== '全部') {
+    filtered = filtered.filter(report => report.type === filterType.value)
+  }
+  
+  // 搜索筛选
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase()
+    filtered = filtered.filter(report => 
+      report.title.toLowerCase().includes(query) ||
+      report.type.toLowerCase().includes(query) ||
+      report.date.toLowerCase().includes(query)
+    )
+  }
+  
+  // 排序
+  const sorted = [...filtered]
+  switch (sortOrder.value) {
+    case '最新优先':
+      return sorted.sort((a, b) => b.id - a.id)
+    case '最旧优先':
+      return sorted.sort((a, b) => a.id - b.id)
+    case '名称升序':
+      return sorted.sort((a, b) => a.title.localeCompare(b.title))
+    case '名称降序':
+      return sorted.sort((a, b) => b.title.localeCompare(a.title))
+    default:
+      return sorted
+  }
+})
 
 // 历史报告数据
 const reports = ref([
@@ -279,6 +370,14 @@ const reports = ref([
     size: '3.2 MB',
     date: '2025-08-17',
     downloadUrl: '/reports/player-analysis.pdf'
+  },
+  {
+    id: 5,
+    title: '武术训练总结报告',
+    type: 'Word',
+    size: '1.5 MB',
+    date: '2025-08-16',
+    downloadUrl: '/reports/training-summary.docx'
   }
 ])
 
@@ -324,6 +423,13 @@ const downloadReport = (report) => {
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
+}
+
+const previewReport = (report) => {
+  // 模拟预览功能
+  console.log('预览报告:', report.title)
+  // 实际应用中这里会打开预览窗口或新标签页
+  window.open(report.downloadUrl, '_blank')
 }
 
 
