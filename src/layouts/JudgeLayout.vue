@@ -29,13 +29,32 @@
           to="/home"
           exact
         ></v-list-item>
-        <v-list-item 
-          prepend-icon="mdi-play-box-multiple" 
-          title="实时回放" 
-          value="replay" 
-          to="/replay"
-          exact
-        ></v-list-item>
+        <v-list-group value="replay-management" fluid>
+          <template v-slot:activator="{ props }">
+            <v-list-item
+              prepend-icon="mdi-play-box-multiple"
+              title="回放处理"
+              v-bind="props"
+            ></v-list-item>
+          </template>
+          
+          <v-list-item
+            prepend-icon="mdi-play"
+            title="实时回放"
+            value="replay"
+            to="/replay"
+            exact
+            style="padding-left: 32px !important;"
+          ></v-list-item>
+          <v-list-item
+            prepend-icon="mdi-video-plus"
+            title="新增赛事"
+            value="new-match"
+            to="/new-match"
+            exact
+            style="padding-left: 32px !important;"
+          ></v-list-item>
+        </v-list-group>
         <v-list-item 
           prepend-icon="mdi-database" 
           title="数据备份" 
