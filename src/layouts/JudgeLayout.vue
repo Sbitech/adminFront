@@ -18,12 +18,12 @@
       >
 
       </v-list-item>
-
+    
       <v-divider></v-divider>
 
       <v-list density="compact" nav>
         <v-list-item 
-          prepend-icon="mdi-home" 
+          prepend-icon="mdi-home"   
           title="主页" 
           value="home" 
           to="/home"
@@ -69,6 +69,20 @@
           title="消息通知" 
           value="notification" 
           to="/notification"
+          exact
+        ></v-list-item>
+        <v-list-item 
+          prepend-icon="mdi-trophy" 
+          title="比赛结果" 
+          value="result-display" 
+          to="/result-display"
+          exact
+        ></v-list-item>
+        <v-list-item 
+          prepend-icon="mdi-medal" 
+          title="最终评分" 
+          value="final-score-display" 
+          to="/final-score-display"
           exact
         ></v-list-item>
         <v-list-group value="permission" fluid>
