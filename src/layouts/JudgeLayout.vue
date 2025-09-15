@@ -90,13 +90,7 @@
           to="/notification"
           exact
         ></v-list-item>
-        <v-list-item 
-          prepend-icon="mdi-trophy" 
-          title="比赛结果" 
-          value="result-display" 
-          to="/result-display"
-          exact
-        ></v-list-item>
+
         <v-list-item 
           prepend-icon="mdi-medal" 
           title="最终评分" 
