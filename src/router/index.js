@@ -95,6 +95,16 @@ const router = createRouter({
           path: 'rule-library',
           name: 'rule-library',
           component: () => import('../views/rule-library/index.vue')
+        },
+        {
+          path: 'result-display',
+          name: 'result-display',
+          component: () => import('../views/result-display/index.vue')
+        },
+        {
+          path: 'final-score-display',
+          name: 'final-score-display',
+          component: () => import('../views/final-score-display/index.vue')
         }
       ]
     }
