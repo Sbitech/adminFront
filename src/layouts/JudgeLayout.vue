@@ -9,6 +9,7 @@
       width="240"
       class="judge-sidebar"
       elevation="2"
+      :style="{ display: isFullscreen ? 'none' : 'block' }"
     >
       <v-list-item
         prepend-avatar="https://randomuser.me/api/portraits/men/85.jpg"
@@ -146,7 +147,7 @@
     </v-navigation-drawer>
 
     <!-- 顶部工具栏 -->
-    <v-app-bar color="#42b883" dark>
+    <v-app-bar color="#42b883" dark :style="{ display: isFullscreen ? 'none' : 'flex' }">
       <v-app-bar-nav-icon @click="toggleDrawer"></v-app-bar-nav-icon>
       <v-app-bar-title>武术裁判评分系统</v-app-bar-title>
       
@@ -360,6 +361,9 @@ const rail = ref(false)
 const router = useRouter()
 const windowWidth = ref(window.innerWidth)
 
+// 全屏状态管理
+const isFullscreen = ref(false)
+
 const isMobile = computed(() => windowWidth.value <= 1264)
 
 const updateWidth = () => {
@@ -374,11 +378,28 @@ onMounted(() => {
   }
   // 获取裁判姓名
   getRefereeName()
+  
+  // 监听全屏切换事件
+  window.addEventListener('toggleFullscreen', handleFullscreenToggle)
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', updateWidth)
+  window.removeEventListener('toggleFullscreen', handleFullscreenToggle)
 })
+
+// 处理全屏切换
+const handleFullscreenToggle = (event) => {
+  isFullscreen.value = event.detail.isFullscreen
+  
+  // 隐藏/显示侧边栏和顶部栏
+  if (isFullscreen.value) {
+    drawer.value = false
+  } else {
+    // 恢复原来的状态
+    drawer.value = !isMobile.value
+  }
+}
 
 const toggleDrawer = () => {
   if (isMobile.value) {

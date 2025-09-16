@@ -1,5 +1,20 @@
 <template>
   <v-container fluid class="final-score-page">
+    
+    <!-- 全屏控制按钮 -->
+    <v-row class="fullscreen-control">
+      <v-col cols="12" class="text-right">
+        <v-btn
+          icon
+          size="small"
+          :color="isFullscreen ? 'primary' : 'default'"
+          @click="toggleFullscreen"
+          class="fullscreen-btn"
+        >
+          <v-icon>{{ isFullscreen ? 'mdi-fullscreen-exit' : 'mdi-fullscreen' }}</v-icon>
+        </v-btn>
+      </v-col>
+    </v-row>
   
     <!-- 选手信息卡片 -->
     <v-row>
@@ -39,6 +54,7 @@
                   <th class="text-right">基础分</th>
                   <th class="text-right">难度分</th>
                   <th class="text-right">完成分</th>
+                  <th class="text-right">扣分</th>
                   <th class="text-right">得分</th>
                 </tr>
               </thead>
@@ -48,7 +64,8 @@
                   <td class="text-right">{{ movement.baseScore.toFixed(2) }}</td>
                   <td class="text-right">{{ movement.difficultyScore.toFixed(2) }}</td>
                   <td class="text-right">{{ movement.completionScore.toFixed(2) }}</td>
-                  <td class="text-right font-weight-bold">{{ movement.finalScore.toFixed(2) }}</td>
+                  <td class="text-right text-red">{{ movement.deduction.toFixed(2) }}</td>
+                  <td class="text-right font-weight-bold">{{ calculateFinalScore(movement).toFixed(2) }}</td>
                 </tr>
                 <!-- 汇总行 -->
                 <tr class="summary-row">
@@ -56,8 +73,10 @@
                   <td class="text-right"><strong>{{ totalBaseScore.toFixed(2) }}</strong></td>
                   <td class="text-right"><strong>{{ totalDifficultyScore.toFixed(2) }}</strong></td>
                   <td class="text-right"><strong>{{ totalCompletionScore.toFixed(2) }}</strong></td>
+                  <td class="text-right text-red"><strong>{{ totalDeduction.toFixed(2) }}</strong></td>
                   <td class="text-right"><strong>{{ subtotalScore.toFixed(2) }}</strong></td>
                 </tr>
+
                
               </tbody>
             </v-table>
@@ -70,7 +89,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 
 // 响应式数据
 const currentMatch = ref({
@@ -88,20 +107,56 @@ const currentPlayer = ref({
 })
 
 // 最终评分数据
-const finalTotalScore = ref(75.30)
-const finalPenaltyScore = ref(1.40)
+const finalTotalScore = computed(() => {
+  return movements.value.reduce((sum, movement) => sum + calculateFinalScore(movement), 0)
+})
+const finalPenaltyScore = computed(() => {
+  return movements.value.reduce((sum, movement) => sum + movement.deduction, 0)
+})
+
+// 全屏状态管理
+const isFullscreen = ref(false)
+
+// 切换全屏状态
+const toggleFullscreen = () => {
+  isFullscreen.value = !isFullscreen.value
+  
+  // 触发自定义事件通知布局组件
+  const event = new CustomEvent('toggleFullscreen', {
+    detail: { isFullscreen: isFullscreen.value }
+  })
+  window.dispatchEvent(event)
+}
+
+// 监听全屏状态变化
+const handleFullscreenChange = (event) => {
+  isFullscreen.value = event.detail.isFullscreen
+}
+
+onMounted(() => {
+  window.addEventListener('fullscreenChanged', handleFullscreenChange)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('fullscreenChanged', handleFullscreenChange)
+})
 
 // 招式评分数据
 const movements = ref([
-  { name: '起势', baseScore: 9.20, difficultyScore: 2.0, completionScore: 9.20, finalScore: 9.20 },
-  { name: '野马分鬃', baseScore: 9.50, difficultyScore: 2.5, completionScore: 9.50, finalScore: 9.50 },
-  { name: '白鹤亮翅', baseScore: 9.30, difficultyScore: 2.3, completionScore: 9.30, finalScore: 9.30 },
-  { name: '搂膝拗步', baseScore: 9.40, difficultyScore: 2.4, completionScore: 9.40, finalScore: 9.40 },
-  { name: '手挥琵琶', baseScore: 9.10, difficultyScore: 2.2, completionScore: 9.10, finalScore: 9.10 },
-  { name: '倒卷肱', baseScore: 9.60, difficultyScore: 2.6, completionScore: 9.60, finalScore: 9.60 },
-  { name: '左揽雀尾', baseScore: 9.70, difficultyScore: 2.7, completionScore: 9.70, finalScore: 9.70 },
-  { name: '右揽雀尾', baseScore: 9.50, difficultyScore: 2.5, completionScore: 9.50, finalScore: 9.50 }
+  { name: '起势', baseScore: 9.20, difficultyScore: 2.0, completionScore: 9.20, deduction: 0.20 },
+  { name: '野马分鬃', baseScore: 9.50, difficultyScore: 2.5, completionScore: 9.50, deduction: 0.15 },
+  { name: '白鹤亮翅', baseScore: 9.30, difficultyScore: 2.3, completionScore: 9.30, deduction: 0.10 },
+  { name: '搂膝拗步', baseScore: 9.40, difficultyScore: 2.4, completionScore: 9.40, deduction: 0.25 },
+  { name: '手挥琵琶', baseScore: 9.10, difficultyScore: 2.2, completionScore: 9.10, deduction: 0.30 },
+  { name: '倒卷肱', baseScore: 9.60, difficultyScore: 2.6, completionScore: 9.60, deduction: 0.20 },
+  { name: '左揽雀尾', baseScore: 9.70, difficultyScore: 2.7, completionScore: 9.70, deduction: 0.15 },
+  { name: '右揽雀尾', baseScore: 9.50, difficultyScore: 2.5, completionScore: 9.50, deduction: 0.10 }
 ])
+
+// 计算属性 - 单个招式最终得分（基础分 + 难度分 + 完成分 - 扣分）
+const calculateFinalScore = (movement) => {
+  return movement.baseScore + movement.difficultyScore + movement.completionScore - movement.deduction
+}
 
 // 计算属性 - 汇总数据
 const totalBaseScore = computed(() => {
@@ -116,15 +171,18 @@ const totalCompletionScore = computed(() => {
   return movements.value.reduce((sum, movement) => sum + movement.completionScore, 0)
 })
 
+const totalDeduction = computed(() => {
+  return movements.value.reduce((sum, movement) => sum + movement.deduction, 0)
+})
+
 const subtotalScore = computed(() => {
-  return movements.value.reduce((sum, movement) => sum + movement.finalScore, 0)
+  return movements.value.reduce((sum, movement) => sum + calculateFinalScore(movement), 0)
 })
 </script>
 
 <style scoped>
 .final-score-page {
-  padding: 20px;
-  background-color: #f5f5f5;
+  padding: 10px;
   min-height: 100vh;
 }
 
@@ -272,4 +330,40 @@ const subtotalScore = computed(() => {
     font-size: 2.5rem;
   }
 }
+.fullscreen-control {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+}
+
+.fullscreen-btn {
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.fullscreen-btn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* 全屏模式下的样式调整 */
+:deep(.v-navigation-drawer),
+:deep(.v-app-bar) {
+  transition: all 0.3s ease;
+}
+
+/* 全屏模式下的页面调整 */
+.final-score-page {
+  transition: padding 0.3s ease;
+}
+
+/* 全屏时的额外样式 */
+:deep(.v-main) {
+  transition: padding 0.3s ease;
+}
+
 </style>
