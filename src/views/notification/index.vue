@@ -1,11 +1,5 @@
 <template>
   <v-container fluid>
-    <v-row>
-      <v-col cols="12">
-        <h1 class="text-h4 mb-4">消息通知</h1>
-      </v-col>
-    </v-row>
-
     <v-row class="mb-4">
       <v-col cols="12" sm="6" md="3">
         <v-card class="text-center pa-4 stat-card">
