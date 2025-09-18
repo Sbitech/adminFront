@@ -166,294 +166,462 @@
                 </v-card>
               </v-col>
 
-              <!-- 第二行：AI评分部分 -->
+              <!-- 第二行：实时评分和AI分析 -->
               <v-row>
                 <v-col cols="12">
-                  <v-card>
-
+                  <v-card class="score-analysis-card" elevation="0">
+                    <v-card-text class="pa-6">
                       <v-row>
-                        <!-- AI评分卡片 -->
-                        <v-col cols="12" lg="2">
-                          <v-card class="score-display">
-                            <v-card-title class="text-subtitle-2 text-center" style="color: black;">
-                              <v-icon left>mdi-star-circle</v-icon>
-                              AI评分
+                        <!-- 实时评分框 -->
+                        <v-col cols="12" lg="4">
+                          <v-card elevation="1" class="real-time-score-panel">
+                            <v-card-title class="text-h6 font-weight-bold text-center py-4">
+                              <v-icon left color="primary" size="24">mdi-scoreboard-outline</v-icon>
+                              实时评分
                             </v-card-title>
-
-                            <v-card-text class="pa-3">
-                              <v-card class="score-card total-score mb-2" elevation="1">
-                                <div class="score-label">综合</div>
-                                <div class="score-value">{{ ((aiScores.difficulty + aiScores.fluidity +
-                                  aiScores.appearance) /
-                                  3).toFixed(1) }}</div>
-                              </v-card>
-                              <v-card class="score-card difficulty-score mb-2" elevation="1">
-                                <div class="score-label">难度</div>
-                                <div class="score-value">{{ aiScores.difficulty }}</div>
-                              </v-card>
-                              <v-card class="score-card flow-score mb-2" elevation="1">
-                                <div class="score-label">流畅</div>
-                                <div class="score-value">{{ aiScores.fluidity }}</div>
-                              </v-card>
-                              <v-card class="score-card appearance-score mb-2" elevation="1">
-                                <div class="score-label">服饰</div>
-                                <div class="score-value">{{ aiScores.appearance }}</div>
-                              </v-card>
+                            <v-card-text class="pa-4">
+                              <div class="score-display-grid">
+                                <div class="score-item difficulty-score">
+                                  <div class="score-header">
+                                    <v-icon size="20" color="info">mdi-trending-up</v-icon>
+                                    <span class="score-title">难度分</span>
+                                  </div>
+                                  <div class="score-value-container">
+                                    <span class="score-number">{{ realTimeScores.difficulty.toFixed(1) }}</span>
+                                    <span class="score-total">/10</span>
+                                  </div>
+                                  <div class="score-progress">
+                                    <v-progress-linear
+                                      :model-value="realTimeScores.difficulty * 10"
+                                      color="info"
+                                      height="6"
+                                      rounded
+                                    ></v-progress-linear>
+                                  </div>
+                                </div>
+                                
+                                <div class="score-item completion-score">
+                                  <div class="score-header">
+                                    <v-icon size="20" color="success">mdi-check-circle-outline</v-icon>
+                                    <span class="score-title">完成分</span>
+                                  </div>
+                                  <div class="score-value-container">
+                                    <span class="score-number">{{ realTimeScores.completion.toFixed(1) }}</span>
+                                    <span class="score-total">/10</span>
+                                  </div>
+                                  <div class="score-progress">
+                                    <v-progress-linear
+                                      :model-value="realTimeScores.completion * 10"
+                                      color="success"
+                                      height="6"
+                                      rounded
+                                    ></v-progress-linear>
+                                  </div>
+                                </div>
+                                
+                                <div class="score-item final-score-item">
+                                  <div class="score-header">
+                                    <v-icon size="20" color="primary">mdi-star-circle-outline</v-icon>
+                                    <span class="score-title">最终得分</span>
+                                  </div>
+                                  <div class="score-value-container final">
+                                    <span class="score-number final">{{ finalScore }}</span>
+                                    <span class="score-total">/10</span>
+                                  </div>
+                                  <div class="score-rating">
+                                    <v-rating
+                                      :model-value="Math.round(parseFloat(finalScore) / 2)"
+                                      color="amber"
+                                      density="compact"
+                                      readonly
+                                    ></v-rating>
+                                  </div>
+                                </div>
+                              </div>
                             </v-card-text>
                           </v-card>
                         </v-col>
 
-                        <!-- 动作细节评分分析 -->
-                        <v-col cols="12" lg="10">
-                          <v-card elevation="2" class="bg-white">
-                            <v-card-title class="text-subtitle-2" style="color: black;">
-                              <v-icon left>mdi-magnify</v-icon>
-                              动作细节评分分析
+                        <!-- AI评分和分析功能 -->
+                        <v-col cols="12" lg="8">
+                          <v-card elevation="1" class="ai-score-panel">
+                            <v-card-title class="text-h6 font-weight-bold py-4">
+                              <v-icon left color="purple" size="24">mdi-brain</v-icon>
+                              AI评分与分析
                             </v-card-title>
                             <v-card-text class="pa-4">
                               <v-row>
-                                <!-- 左侧招式列表 -->
-                                <v-col cols="12" md="3" lg="2">
-                                  <v-card elevation="1" class="h-100 bg-white">
-                                    <v-card-title class="text-subtitle-2 text-center" style="color: black;">
-                                      招式列表
-                                    </v-card-title>
-                                    <v-card-text class="pa-2">
-                                      <v-list density="compact" class="bg-white">
-                                        <v-list-item v-for="(action, index) in actionDetails" :key="index" :class="['cursor-pointer rounded', {
-                                          'bg-blue-lighten-4 elevation-2': selectedActionIndex === index,
-                                          'hover-bg-blue-lighten-5': selectedActionIndex !== index
-                                        }]" @click="selectAction(index)" class="mb-2 transition-all"
-                                          style="transition: all 0.2s ease">
-                                          <v-list-item-title class="text-body-2 font-weight-medium">
-                                            {{ action.name }}
-                                            <v-icon v-if="action.isAdjusted" size="x-small" color="warning"
-                                              class="ml-1">
-                                              mdi-pencil
-                                            </v-icon>
-                                          </v-list-item-title>
-                                          <v-list-item-subtitle class="mt-1">
-                                            <v-chip :color="getScoreColor(action.score)" size="small" variant="flat">
-                                              {{ action.score }}/10
-                                            </v-chip>
-                                            <span v-if="action.isAdjusted" class="text-caption text-warning ml-1">
-                                              已调整
-                                            </span>
-                                          </v-list-item-subtitle>
-                                        </v-list-item>
-                                      </v-list>
-                                    </v-card-text>
+                                <!-- AI评分显示 -->
+                                <v-col cols="12" md="4">
+                                  <v-card class="ai-score-display" elevation="0">
+                                    <div class="ai-score-header">
+                                      <v-icon size="18" color="purple">mdi-robot</v-icon>
+                                      <span class="ai-score-title">AI评分</span>
+                                    </div>
+                                    <div class="ai-score-value">
+                                      <span class="ai-score-number">{{ aiScore.toFixed(1) }}</span>
+                                      <span class="ai-score-total">/10</span>
+                                    </div>
+                                    <div class="ai-score-confidence">
+                                      <v-chip
+                                        size="small"
+                                        color="purple"
+                                        variant="tonal"
+                                      >
+                                        置信度 {{ aiConfidence }}%
+                                      </v-chip>
+                                    </div>
                                   </v-card>
                                 </v-col>
+                                
+                                <!-- 功能按钮 -->
+                                <v-col cols="12" md="8">
+                                  <v-row class="function-buttons">
+                                    <v-col cols="12" sm="4">
+                                      <v-btn
+                                        block
+                                        color="primary"
+                                        variant="tonal"
+                                        size="default"
+                                        prepend-icon="mdi-human-edit"
+                                        @click="toggleManualScoring"
+                                        class="function-btn"
+                                      >
+                                        {{ showManualScoringPanel ? '收起评分' : '人工评分' }}
+                                      </v-btn>
+                                    </v-col>
 
-                                <!-- 右侧评分详情 -->
-                                <v-col cols="12" md="9" lg="10">
-                                  <v-card elevation="1" class="h-100 bg-white">
-                                    <v-card-text v-if="selectedAction" class="pa-4">
-                                      <v-row>
-                                        <v-col cols="12">
-                                          <div class="text-h5 font-weight-bold mb-2" style="color: black;">{{
-                                            selectedAction.name }}
-                                          </div>
-                                          <v-divider class="mb-4"></v-divider>
-                                        </v-col>
-                                      </v-row>
-
-                                      <v-row>
-                                        <!-- 技术评分 -->
-                                        <v-col cols="12" md="6" lg="3">
-                                          <v-card elevation="1" class="pa-3 h-100 score-card"
-                                            style="border-radius: 12px;">
-                                            <div class="text-subtitle-2 font-weight-bold mb-3 text-center"
-                                              style="color: #2c3e50;">
-                                              技术评分</div>
-                                            <div class="d-flex justify-space-between align-center mb-2">
-                                              <span class="text-body-2" style="color: #2c3e50;">动作难度</span>
-                                              <span class="text-body-2 font-weight-bold" style="color: #42b883;">{{
-                                                selectedAction.difficulty }}</span>
+                                    <v-col cols="12" sm="4">
+                                      <v-btn
+                                        block
+                                        color="success"
+                                        variant="tonal"
+                                        size="default"
+                                        prepend-icon="mdi-chart-line"
+                                        @click="openAIAnalysis"
+                                        class="function-btn"
+                                      >
+                                        AI分析
+                                      </v-btn>
+                                    </v-col>
+                                  </v-row>
+                                </v-col>
+                              </v-row>
+                              
+                              <!-- AI分析结果展示 -->
+                              <v-expand-transition>
+                                <div v-if="showAIAnalysisResult" class="ai-analysis-result">
+                                  <v-divider class="my-4"></v-divider>
+                                  <v-card elevation="0" class="analysis-content-card">
+                                    <v-card-text class="pa-4">
+                                      <div class="analysis-header">
+                                        <v-icon size="18" color="success">mdi-check-decagram</v-icon>
+                                        <span class="analysis-title">AI分析结果</span>
+                                        <v-chip
+                                          size="small"
+                                          color="success"
+                                          variant="flat"
+                                          class="confidence-chip"
+                                        >
+                                          {{ analysisConfidence }}% 置信度
+                                        </v-chip>
+                                      </div>
+                                      <div class="analysis-content">{{ aiAnalysisResult }}</div>
+                                      <div class="analysis-details mt-3">
+                                        <v-row>
+                                          <v-col cols="6" sm="3">
+                                            <div class="detail-item">
+                                              <div class="detail-label">技术规范</div>
+                                              <div class="detail-value">{{ technicalScore }}分</div>
                                             </div>
-                                            <v-progress-linear :model-value="selectedAction.difficulty * 10"
-                                              color="#42b883" height="8" rounded class="mb-3"></v-progress-linear>
-
-                                            <div class="d-flex justify-space-between align-center mb-2">
-                                              <span class="text-body-2" style="color: #2c3e50;">执行质量</span>
-                                              <span class="text-body-2 font-weight-bold" style="color: #42b883;">{{
-                                                selectedAction.execution }}</span>
+                                          </v-col>
+                                          <v-col cols="6" sm="3">
+                                            <div class="detail-item">
+                                              <div class="detail-label">动作流畅</div>
+                                              <div class="detail-value">{{ fluencyScore }}分</div>
                                             </div>
-                                            <v-progress-linear :model-value="selectedAction.execution * 10"
-                                              color="#42b883" height="8" rounded></v-progress-linear>
-                                          </v-card>
-                                        </v-col>
-
-                                        <!-- 表现评分 -->
-                                        <v-col cols="12" md="6" lg="3">
-                                          <v-card elevation="1" class="pa-3 h-100 score-card"
-                                            style="border-radius: 12px;">
-                                            <div class="text-subtitle-2 font-weight-bold mb-3 text-center"
-                                              style="color: #2c3e50;">
-                                              表现评分</div>
-                                            <v-card-text class="pa-0">
-                                              <div class="mb-3">
-                                                <div class="d-flex justify-space-between mb-2">
-                                                  <span class="text-body-2" style="color: #2c3e50;">动作幅度</span>
-                                                  <span class="text-body-2 font-weight-bold" style="color: #42b883;">{{
-                                                    selectedAction.amplitude }}/10</span>
-                                                </div>
-                                                <v-progress-linear :model-value="selectedAction.amplitude * 10"
-                                                  color="#42b883" height="8" rounded></v-progress-linear>
-                                              </div>
-                                              <div class="mb-3">
-                                                <div class="d-flex justify-space-between mb-2">
-                                                  <span class="text-body-2" style="color: #2c3e50;">落地稳定</span>
-                                                  <span class="text-body-2 font-weight-bold" style="color: #42b883;">{{
-                                                    selectedAction.landing }}/10</span>
-                                                </div>
-                                                <v-progress-linear :model-value="selectedAction.landing * 10"
-                                                  color="#42b883" height="8" rounded></v-progress-linear>
-                                              </div>
-                                              <div>
-                                                <div class="d-flex justify-space-between mb-2">
-                                                  <span class="text-body-2" style="color: #2c3e50;">节奏控制</span>
-                                                  <span class="text-body-2 font-weight-bold" style="color: #42b883;">{{
-                                                    selectedAction.timing }}/10</span>
-                                                </div>
-                                                <v-progress-linear :model-value="selectedAction.timing * 10"
-                                                  color="#42b883" height="8" rounded></v-progress-linear>
-                                              </div>
-                                            </v-card-text>
-                                          </v-card>
-                                        </v-col>
-
-                                        <!-- AI评语 -->
-                                        <v-col cols="12" md="12" lg="6">
-                                          <v-card elevation="1" class="pa-4 h-100 score-card"
-                                            style="border-radius: 12px;">
-                                            <div class="text-h6 font-weight-bold mb-4 text-center"
-                                              style="color: #2c3e50;">AI评语</div>
-                                            <v-list density="compact" class="bg-transparent">
-                                              <v-list-item v-for="(comment, cIndex) in selectedAction.comments"
-                                                :key="cIndex" class="mb-2"
-                                                style="color: #2c3e50; line-height: 1.4; font-size: 16px; min-height: auto;">
-                                                <template v-slot:prepend>
-                                                  <v-icon size="small" color="#42b883"
-                                                    class="mr-2 mt-1">mdi-circle-small</v-icon>
-                                                </template>
-                                                <v-list-item-title
-                                                  style="font-size: 16px; font-weight: 400; white-space: normal;">
-                                                  {{ comment }}
-                                                </v-list-item-title>
-                                              </v-list-item>
-                                            </v-list>
-                                            <div class="mt-4 text-center">
-                                              <v-btn color="#42b883" size="large" variant="outlined"
-                                                prepend-icon="mdi-pencil" @click="openManualAdjustment"
-                                                style="text-transform: none; font-weight: 500; border-radius: 6px; font-size: 16px;">
-                                                人工干预评分
-                                              </v-btn>
+                                          </v-col>
+                                          <v-col cols="6" sm="3">
+                                            <div class="detail-item">
+                                              <div class="detail-label">难度系数</div>
+                                              <div class="detail-value">{{ difficultyCoeff }}</div>
                                             </div>
-                                          </v-card>
-                                        </v-col>
-                                      </v-row>
-                                    </v-card-text>
-
-                                    <v-card-text v-else class="d-flex align-center justify-center"
-                                      style="height: 300px;">
-                                      <div class="text-center">
-                                        <v-icon size="64" color="primary" class="mb-4">mdi-gesture-tap</v-icon>
-                                        <div class="text-h6 font-weight-medium" style="color: black;">请选择招式</div>
-                                        <div class="text-body-2" style="color: black;">点击左侧招式查看详细评分分析</div>
+                                          </v-col>
+                                          <v-col cols="6" sm="3">
+                                            <div class="detail-item">
+                                              <div class="detail-label">完成度</div>
+                                              <div class="detail-value">{{ completionScore }}%</div>
+                                            </div>
+                                          </v-col>
+                                        </v-row>
                                       </div>
                                     </v-card-text>
                                   </v-card>
-                                </v-col>
-                              </v-row>
+                                </div>
+                              </v-expand-transition>
+                              
+                              <!-- 人工评分面板 -->
+                              <v-expand-transition>
+                                <div v-if="showManualScoringPanel" class="manual-scoring-panel">
+                                  <v-divider class="my-4"></v-divider>
+                                  <v-card elevation="0" class="manual-scoring-content">
+                                    <v-card-text class="pa-4">
+                                      <div class="manual-scoring-header">
+                                        <v-icon size="18" color="primary">mdi-human-edit</v-icon>
+                                        <span class="manual-scoring-title">人工评分</span>
+                                        <v-chip
+                                          size="small"
+                                          color="primary"
+                                          variant="flat"
+                                        >
+                                          专业评分
+                                        </v-chip>
+                                      </div>
+                                      <v-row class="mt-3">
+                                        <v-col cols="12" md="6">
+                                          <div class="scoring-control">
+                                            <div class="section-header mb-3">
+                                              <v-icon size="20" color="primary">mdi-trending-up</v-icon>
+                                              <span class="section-title">调整评分</span>
+                                              <v-chip size="small" color="primary" variant="tonal">
+                                                精确到0.1分
+                                              </v-chip>
+                                            </div>
+                                            <div class="score-display mb-3">
+                                              <div class="current-score-circle">
+                                                <div class="score-inner-circle">
+                                                  <div class="score-number-display">{{ manualScore.toFixed(1) }}</div>
+                                                  <div class="score-label-display">当前评分</div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                            <v-slider
+                                              v-model="manualScore"
+                                              :min="0"
+                                              :max="10"
+                                              :step="0.1"
+                                              color="primary"
+                                              track-color="grey-lighten-2"
+                                              thumb-size="20"
+                                              track-size="6"
+                                              class="compact-score-slider"
+                                              hide-details
+                                            ></v-slider>
+                                            <div class="score-controls mt-2">
+                                              <v-btn
+                                                icon="mdi-minus"
+                                                size="x-small"
+                                                variant="tonal"
+                                                @click="manualScore = Math.max(0, manualScore - 0.5)"
+                                              ></v-btn>
+                                              <span class="score-range mx-2">{{ manualScore.toFixed(1) }} / 10</span>
+                                              <v-btn
+                                                icon="mdi-plus"
+                                                size="x-small"
+                                                variant="tonal"
+                                                @click="manualScore = Math.min(10, manualScore + 0.5)"
+                                              ></v-btn>
+                                            </div>
+                                          </div>
+                                        </v-col>
+                                        <v-col cols="12" md="6">
+                                          <div class="scoring-reason">
+                                            <div class="section-header mb-3">
+                                              <v-icon size="20" color="primary">mdi-comment-text</v-icon>
+                                              <span class="section-title">评分说明</span>
+                                              <span class="text-caption text-grey">可选</span>
+                                            </div>
+                                            <v-textarea
+                                              v-model="scoringReason"
+                                              placeholder="请输入评分理由或建议..."
+                                              rows="3"
+                                              variant="outlined"
+                                              density="compact"
+                                              hide-details
+                                            ></v-textarea>
+                                            <div class="scoring-actions mt-3">
+                                              <v-btn
+                                                color="primary"
+                                                variant="elevated"
+                                                size="small"
+                                                @click="saveManualScore"
+                                                :loading="savingScore"
+                                                block
+                                              >
+                                                <v-icon start>mdi-check</v-icon>
+                                                确认评分
+                                              </v-btn>
+                                            </div>
+                                          </div>
+                                        </v-col>
+                                      </v-row>
+                                    </v-card-text>
+                                  </v-card>
+                                </div>
+                              </v-expand-transition>
                             </v-card-text>
                           </v-card>
                         </v-col>
                       </v-row>
+                    </v-card-text>
                   </v-card>
                 </v-col>
               </v-row>
+
             </v-row>
           </v-card-text>
         </v-card>
       </v-col>
     </v-row>
 
-    <!-- 评分调整对话框 -->
-    <v-dialog v-model="showScoreAdjustment" max-width="500px">
-      <v-card>
-        <v-card-title>
-          <v-icon left>mdi-pencil-ruler</v-icon>
-          人工干预评分
-        </v-card-title>
-        <v-card-text>
-          <v-form>
+
+  </v-container>
+
+  <!-- 人工评分对话框 -->
+  <v-dialog v-model="showManualScoringDialog" max-width="500" persistent>
+    <v-card class="manual-scoring-dialog">
+      <!-- 头部标题 -->
+      <v-card-title class="dialog-header text-center py-4">
+        <div class="header-content">
+          <v-icon size="32" color="primary" class="mb-2">mdi-human-edit</v-icon>
+          <div class="text-h5 font-weight-bold">人工评分</div>
+          <div class="text-subtitle-2 text-grey">调整当前动作评分</div>
+        </div>
+      </v-card-title>
+      
+      <v-divider></v-divider>
+      
+      <!-- 评分内容区域 -->
+      <v-card-text class="pa-6">
+        <!-- 当前评分显示 -->
+        <div class="current-score-display mb-6">
+          <div class="score-circle">
+            <div class="score-inner">
+              <div class="score-number">{{ manualScore.toFixed(1) }}</div>
+              <div class="score-label">当前评分</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 评分滑块区域 -->
+        <div class="scoring-section mb-4">
+          <div class="section-header mb-3">
+            <v-icon size="20" color="primary">mdi-trending-up</v-icon>
+            <span class="section-title">调整评分</span>
+            <v-chip size="small" color="primary" variant="tonal">
+              精确到0.1分
+            </v-chip>
+          </div>
+          
+          <v-slider
+            v-model="manualScore"
+            :min="0"
+            :max="10"
+            :step="0.1"
+            color="primary"
+            track-color="grey-lighten-2"
+            thumb-size="24"
+            track-size="8"
+            class="score-slider"
+          >
+            <template v-slot:prepend>
+              <v-btn
+                icon="mdi-minus"
+                size="small"
+                variant="tonal"
+                @click="manualScore = Math.max(0, manualScore - 0.5)"
+              ></v-btn>
+            </template>
+            <template v-slot:append>
+              <v-btn
+                icon="mdi-plus"
+                size="small"
+                variant="tonal"
+                @click="manualScore = Math.min(10, manualScore + 0.5)"
+              ></v-btn>
+            </template>
+          </v-slider>
+          
+          <!-- 评分等级显示 -->
+          <div class="score-levels mt-4">
             <v-row>
-              <v-col cols="12">
-                <v-slider v-model="adjustmentScores.difficulty" label="动作难度分" min="0" max="10" step="0.1" thumb-label
-                  color="primary"></v-slider>
+              <v-col cols="3" class="text-center">
+                <div class="level-item" :class="{ active: manualScore < 4 }">
+                  <v-icon size="20" color="error">mdi-star-outline</v-icon>
+                  <div class="level-text">待改进</div>
+                  <div class="level-range">0-3.9</div>
+                </div>
               </v-col>
-              <v-col cols="12">
-                <v-slider v-model="adjustmentScores.fluidity" label="动作流畅分" min="0" max="10" step="0.1" thumb-label
-                  color="success"></v-slider>
+              <v-col cols="3" class="text-center">
+                <div class="level-item" :class="{ active: manualScore >= 4 && manualScore < 6 }">
+                  <v-icon size="20" color="warning">mdi-star-half-full</v-icon>
+                  <div class="level-text">一般</div>
+                  <div class="level-range">4-5.9</div>
+                </div>
               </v-col>
-              <v-col cols="12">
-                <v-slider v-model="adjustmentScores.appearance" label="服饰评分" min="0" max="10" step="0.1" thumb-label
-                  color="info"></v-slider>
+              <v-col cols="3" class="text-center">
+                <div class="level-item" :class="{ active: manualScore >= 6 && manualScore < 8 }">
+                  <v-icon size="20" color="info">mdi-star</v-icon>
+                  <div class="level-text">良好</div>
+                  <div class="level-range">6-7.9</div>
+                </div>
               </v-col>
-              <v-col cols="12">
-                <v-textarea v-model="adjustmentScores.reason" label="调整原因" rows="3" variant="outlined"></v-textarea>
+              <v-col cols="3" class="text-center">
+                <div class="level-item" :class="{ active: manualScore >= 8 }">
+                  <v-icon size="20" color="success">mdi-star-face</v-icon>
+                  <div class="level-text">优秀</div>
+                  <div class="level-range">8-10</div>
+                </div>
               </v-col>
             </v-row>
-          </v-form>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="grey" variant="text" @click="cancelScoreAdjustment">
-            取消
-          </v-btn>
-          <v-btn color="primary" variant="text" @click="saveScoreAdjustment">
-            保存调整
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
-    <!-- 人工干预评分对话框 -->
-    <v-dialog v-model="showManualAdjustment" max-width="500px">
-      <v-card>
-        <v-card-title>
-          <v-icon left>mdi-pencil</v-icon>
-          人工干预评分
-        </v-card-title>
-        <v-card-text>
-          <v-form>
-            <div class="text-subtitle-1 mb-4" style="color: black;">
-              招式：{{ manualAdjustment.actionName }}
-            </div>
-
-            <v-text-field v-model.number="manualAdjustment.score" label="评分" type="number" min="0" max="10" step="0.1"
-              variant="outlined" density="comfortable" hide-details="auto" class="mb-4"></v-text-field>
-
-            <v-textarea v-model="manualAdjustment.reason" label="修改原因" rows="3" outlined dense
-              placeholder="请详细说明修改评分的原因..." :rules="[v => !!v || '修改原因不能为空']"></v-textarea>
-
-            <div class="text-caption text-grey mt-2">
-              当前评分：{{ selectedAction?.score || 0 }}/10
-            </div>
-          </v-form>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="grey" text @click="showManualAdjustment = false">取消</v-btn>
-          <v-btn color="primary" @click="saveManualAdjustment" :disabled="!manualAdjustment.reason.trim()">
-            保存修改
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-container>
+          </div>
+        </div>
+        
+        <!-- 评分原因输入 -->
+        <div class="reason-section">
+          <div class="section-header mb-3">
+            <v-icon size="20" color="primary">mdi-comment-text</v-icon>
+            <span class="section-title">评分说明</span>
+            <span class="text-caption text-grey">可选</span>
+          </div>
+          <v-textarea
+            v-model="scoringReason"
+            placeholder="请输入评分理由或建议..."
+            rows="2"
+            variant="outlined"
+            density="comfortable"
+            hide-details
+          ></v-textarea>
+        </div>
+      </v-card-text>
+      
+      <v-divider></v-divider>
+      
+      <!-- 底部按钮 -->
+      <v-card-actions class="pa-4">
+        <v-btn
+          color="grey"
+          variant="tonal"
+          @click="closeManualScoring"
+          class="action-btn"
+        >
+          <v-icon start>mdi-close</v-icon>
+          取消
+        </v-btn>
+        <v-spacer></v-spacer>
+        <v-btn
+          color="primary"
+          variant="elevated"
+          @click="saveManualScore"
+          class="action-btn"
+          :loading="savingScore"
+        >
+          <v-icon start>mdi-check</v-icon>
+          确认评分
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup>
@@ -471,66 +639,42 @@ const selectedMatch = ref(null)
 // 当前视角
 const currentPerspective = ref('front')
 
-// AI评分数据
-const aiScores = ref({
+// 实时评分数据
+const realTimeScores = ref({
   difficulty: 8.5,
-  fluidity: 7.8,
-  appearance: 9.2
+  completion: 7.8
 })
 
-// 动作细节评分
-const actionDetails = ref([
-  {
-    name: '腾空摆莲720°',
-    score: 8.8,
-    difficulty: 9.2,
-    execution: 8.5,
-    amplitude: 8.7,
-    landing: 8.8,
-    timing: 9.0,
-    comments: ['旋转角度完整', '空中姿态优美', '落地稳定性好']
-  },
-  {
-    name: '旋风脚360°',
-    score: 7.9,
-    difficulty: 7.5,
-    execution: 8.2,
-    amplitude: 8.0,
-    landing: 7.8,
-    timing: 8.0,
-    comments: ['转体速度略慢', '空中分腿不够充分', '落地有轻微晃动']
-  },
-  {
-    name: '侧空翻',
-    score: 8.5,
-    difficulty: 8.0,
-    execution: 8.8,
-    amplitude: 8.5,
-    landing: 8.2,
-    timing: 8.5,
-    comments: ['空中姿态控制良好', '翻转速度适中', '落地重心略偏']
-  },
-  {
-    name: '后手翻',
-    score: 8.2,
-    difficulty: 7.8,
-    execution: 8.5,
-    amplitude: 8.0,
-    landing: 8.0,
-    timing: 8.5,
-    comments: ['手部支撑有力', '身体线条流畅', '动作连贯性好']
-  },
-  {
-    name: '鲤鱼打挺',
-    score: 9.0,
-    difficulty: 8.5,
-    execution: 9.2,
-    amplitude: 8.8,
-    landing: 9.0,
-    timing: 9.5,
-    comments: ['爆发力出色', '动作干净利落', '节奏感强']
-  }
-])
+// AI评分数据
+const aiScore = ref(8.2)
+const aiConfidence = ref(87)
+
+// 最终得分计算（综合实时评分和AI评分）
+const finalScore = computed(() => {
+  const realtimeFinal = (realTimeScores.value.difficulty + realTimeScores.value.completion) / 2
+  const combined = (realtimeFinal + aiScore.value) / 2
+  return combined.toFixed(1)
+})
+
+// AI分析详细数据
+const technicalScore = ref(8.5)
+const fluencyScore = ref(7.8)
+const difficultyCoeff = ref(1.2)
+const completionScore = ref(85)
+
+// AI分析相关
+const showAIAnalysisResult = ref(false)
+const aiAnalysisResult = ref('')
+const analysisConfidence = ref(85)
+
+// 对话框状态
+const showManualScoringDialog = ref(false)
+const showManualScoringPanel = ref(false)
+const manualScore = ref(8.5)
+const scoringReason = ref('')
+const savingScore = ref(false)
+
+
 
 // 动作跳转相关数据
 const currentActionIndex = ref(0)
@@ -542,15 +686,6 @@ const actionTimestamps = ref([
   { start: 25, end: 32, name: '后手翻' },
   { start: 32, end: 40, name: '鲤鱼打挺' }
 ])
-
-// 评分调整对话框
-const showScoreAdjustment = ref(false)
-const adjustmentScores = ref({
-  difficulty: 0,
-  fluidity: 0,
-  appearance: 0,
-  reason: ''
-})
 
 // 当前视频地址
 const currentVideoUrl = computed(() => {
@@ -870,102 +1005,11 @@ const handleVideoError = () => {
   console.error('视频加载失败，请检查视频路径')
 }
 
-// 获取分数颜色
-const getScoreColor = (score) => {
-  if (score >= 9) return 'success'
-  if (score >= 7) return 'warning'
-  return 'error'
-}
 
-// 打开评分调整对话框
-const openScoreAdjustment = () => {
-  adjustmentScores.value = {
-    difficulty: aiScores.value.difficulty,
-    fluidity: aiScores.value.fluidity,
-    appearance: aiScores.value.appearance,
-    reason: ''
-  }
-  showScoreAdjustment.value = true
-}
 
-// 保存评分调整
-const saveScoreAdjustment = () => {
-  aiScores.value.difficulty = adjustmentScores.value.difficulty
-  aiScores.value.fluidity = adjustmentScores.value.fluidity
-  aiScores.value.appearance = adjustmentScores.value.appearance
 
-  console.log('评分已调整:', adjustmentScores.value)
-  showScoreAdjustment.value = false
 
-  // 这里可以添加API调用保存调整记录
-}
 
-// 取消评分调整
-const cancelScoreAdjustment = () => {
-  showScoreAdjustment.value = false
-  adjustmentScores.value = {
-    difficulty: aiScores.value.difficulty,
-    fluidity: aiScores.value.fluidity,
-    appearance: aiScores.value.appearance,
-    reason: ''
-  }
-}
-
-// 展开/收起动作详情
-const expandedActions = ref([])
-const toggleActionDetail = (index) => {
-  const idx = expandedActions.value.indexOf(index)
-  if (idx > -1) {
-    expandedActions.value.splice(idx, 1)
-  } else {
-    expandedActions.value.push(index)
-  }
-}
-const isActionExpanded = (index) => expandedActions.value.includes(index)
-
-// 选择动作详情
-const selectedActionIndex = ref(0)
-const selectedAction = computed(() => actionDetails.value[selectedActionIndex.value])
-
-const selectAction = (index) => {
-  selectedActionIndex.value = index
-}
-
-// 人工干预评分相关
-const showManualAdjustment = ref(false)
-const manualAdjustment = ref({
-  score: 0,
-  reason: '',
-  actionName: ''
-})
-
-const openManualAdjustment = () => {
-  if (selectedAction.value) {
-    manualAdjustment.value = {
-      score: selectedAction.value.score,
-      reason: '',
-      actionName: selectedAction.value.name
-    }
-    showManualAdjustment.value = true
-  }
-}
-
-const saveManualAdjustment = () => {
-  if (selectedAction.value && manualAdjustment.value.reason.trim()) {
-    // 更新动作评分
-    const index = selectedActionIndex.value
-    actionDetails.value[index].score = manualAdjustment.value.score
-    actionDetails.value[index].manualScore = manualAdjustment.value.score
-    actionDetails.value[index].adjustmentReason = manualAdjustment.value.reason
-    actionDetails.value[index].isAdjusted = true
-
-    // 关闭对话框
-    showManualAdjustment.value = false
-
-    // 显示成功提示
-    // 可以在这里添加提示信息
-  }
-}
 
 // 格式化时间（秒 → mm:ss）
 const formatTime = (seconds) => {
@@ -1000,6 +1044,71 @@ const jumpToAction = () => {
     mainVideo.value.currentTime = action.start
     mainVideo.value.play()
   }
+}
+
+// AI分析功能函数
+const openManualScoring = () => {
+  showManualScoringDialog.value = true
+}
+
+const openAppealDialog = () => {
+  showAppealDialog.value = true
+}
+
+const openAIAnalysis = () => {
+  // 模拟AI分析结果和评分计算
+  const analysisResults = [
+    '动作完成度良好，技术规范符合要求',
+    '动作流畅度有待提高，建议加强练习',
+    '整体表现优秀，难度系数较高',
+    '动作标准，完成质量较高'
+  ]
+  
+  // 生成AI评分
+  const baseScore = (realTimeScores.value.difficulty + realTimeScores.value.completion) / 2
+  const aiRandomFactor = (Math.random() - 0.5) * 0.4 // -0.2 到 +0.2 的随机波动
+  aiScore.value = Math.max(0, Math.min(10, baseScore + aiRandomFactor))
+  
+  // 生成详细评分数据
+  technicalScore.value = Math.max(0, Math.min(10, aiScore.value + (Math.random() - 0.5) * 0.6)).toFixed(1)
+  fluencyScore.value = Math.max(0, Math.min(10, aiScore.value + (Math.random() - 0.5) * 0.8)).toFixed(1)
+  difficultyCoeff.value = (1.0 + (Math.random() - 0.5) * 0.4).toFixed(2)
+  completionScore.value = Math.max(0, Math.min(100, (aiScore.value / 10) * 100 + (Math.random() - 0.5) * 10)).toFixed(0)
+  
+  // 生成分析结果
+  aiAnalysisResult.value = analysisResults[Math.floor(Math.random() * analysisResults.length)]
+  analysisConfidence.value = Math.floor(Math.random() * 20) + 80 // 80-99%
+  aiConfidence.value = Math.floor(Math.random() * 15) + 85 // 85-99%
+  
+  showAIAnalysisResult.value = true
+}
+
+const closeManualScoring = () => {
+  showManualScoringDialog.value = false
+  scoringReason.value = '' // 重置评分说明
+}
+
+const saveManualScore = async () => {
+  savingScore.value = true
+  try {
+    console.log('保存人工评分:', manualScore.value, '评分说明:', scoringReason.value)
+    // 模拟保存延迟
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    // 更新实时评分
+    realTimeScores.value.difficulty = manualScore.value
+    showManualScoringDialog.value = false
+    // 显示成功提示
+    console.log('评分保存成功')
+  } catch (error) {
+    console.error('保存评分失败:', error)
+  } finally {
+    savingScore.value = false
+  }
+}
+
+// 切换人工评分面板
+const toggleManualScoring = () => {
+  showManualScoringPanel.value = !showManualScoringPanel.value
 }
 </script>
 
@@ -1116,51 +1225,7 @@ const jumpToAction = () => {
   cursor: pointer;
 }
 
-/* AI评分卡片样式 */
-.score-card {
-  border-radius: 12px;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
 
-.score-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.score-display {
-  text-align: center;
-  margin-bottom: 12px;
-}
-
-.score-value {
-  font-size: 2rem;
-  font-weight: bold;
-  color: #42b883;
-}
-
-.score-max {
-  font-size: 1rem;
-  color: #666;
-  margin-left: 4px;
-}
-
-.action-item {
-  border-radius: 8px;
-  margin-bottom: 8px;
-}
-
-.difficulty-score .score-value {
-  color: #42b883;
-}
-
-.fluidity-score .score-value {
-  color: #42b883;
-}
-
-.appearance-score .score-value {
-  color: #42b883;
-}
 
 :deep(.v-btn) {
   text-transform: none;
@@ -1169,6 +1234,215 @@ const jumpToAction = () => {
 }
 
 :deep(.v-card-title) {
+  font-weight: 600;
+}
+
+/* 实时评分和AI分析样式 */
+.score-analysis-card {
+  background: transparent;
+  box-shadow: none;
+}
+
+.real-time-score-panel {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.real-time-score-panel:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.score-display-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.score-item {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.score-item:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.score-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.score-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.score-value-container {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.score-number {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.score-number.final {
+  font-size: 2.2rem;
+  color: #dc2626;
+}
+
+.score-total {
+  font-size: 1rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.score-progress {
+  margin-top: 8px;
+}
+
+.score-rating {
+  margin-top: 8px;
+}
+
+/* AI评分面板样式 */
+.ai-score-panel {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.ai-score-panel:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.ai-score-display {
+  background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  border: 1px solid #e2e8f0;
+}
+
+.ai-score-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.ai-score-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #7c3aed;
+}
+
+.ai-score-value {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.ai-score-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #7c3aed;
+}
+
+.ai-score-total {
+  font-size: 1rem;
+  color: #a855f7;
+  font-weight: 500;
+}
+
+.ai-score-confidence {
+  display: flex;
+  justify-content: center;
+}
+
+.function-buttons {
+  margin-top: 8px;
+}
+
+.function-btn {
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* AI分析结果样式 */
+.ai-analysis-result {
+  margin-top: 16px;
+}
+
+.analysis-content-card {
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.analysis-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.analysis-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  flex-grow: 1;
+}
+
+.analysis-content {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #475569;
+  margin-bottom: 16px;
+}
+
+.analysis-details {
+  background: white;
+  border-radius: 6px;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.detail-item {
+  text-align: center;
+}
+
+.detail-label {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+.detail-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.confidence-chip {
   font-weight: 600;
 }
 
@@ -1181,4 +1455,177 @@ const jumpToAction = () => {
     font-size: 1.5rem;
   }
 }
+  .action-btn {
+    min-width: 100px;
+  }
+  
+  /* 人工评分对话框样式 */
+  .manual-scoring-dialog {
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  
+  .dialog-header {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .header-content {
+    width: 100%;
+  }
+  
+  /* 圆形评分显示 */
+  .current-score-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .score-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    position: relative;
+  }
+  
+  .score-circle::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2, #667eea);
+    background-size: 400% 400%;
+    animation: gradient-rotate 3s ease infinite;
+    z-index: -1;
+  }
+  
+  @keyframes gradient-rotate {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  .score-inner {
+    background: white;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .score-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #333;
+    line-height: 1;
+  }
+  
+  .score-label {
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 4px;
+  }
+  
+  /* 评分区域 */
+  .scoring-section {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 20px;
+  }
+  
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  
+  .section-title {
+    font-weight: 600;
+    color: #333;
+    flex: 1;
+  }
+  
+  /* 评分滑块 */
+  .score-slider {
+    margin: 20px 0;
+  }
+  
+  /* 评分等级 */
+  .score-levels {
+    background: white;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 16px;
+  }
+  
+  .level-item {
+    padding: 8px 4px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    opacity: 0.6;
+  }
+  
+  .level-item.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    opacity: 1;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  }
+  
+  .level-text {
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin: 4px 0;
+  }
+  
+  .level-range {
+    font-size: 0.7rem;
+    opacity: 0.8;
+  }
+  
+  /* 评分说明区域 */
+  .reason-section {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 16px;
+  }
+  
+  /* 响应式设计 */
+  @media (max-width: 600px) {
+    .score-circle {
+      width: 100px;
+      height: 100px;
+    }
+    
+    .score-inner {
+      width: 80px;
+      height: 80px;
+    }
+    
+    .score-number {
+      font-size: 2rem;
+    }
+    
+    .level-text {
+      font-size: 0.7rem;
+    }
+    
+    .level-range {
+      font-size: 0.6rem;
+    }
+  }
 </style>
