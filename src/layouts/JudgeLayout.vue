@@ -1,160 +1,101 @@
 <template>
   <v-app>
 
-    <v-navigation-drawer
-      v-model="drawer"
-      :rail="rail && !isMobile"
-      :temporary="isMobile"
-      rail-width="56"
-      width="240"
-      class="judge-sidebar"
+    <!-- 顶部工具栏 - 整合侧边栏功能 -->
+    <v-app-bar 
+      color="white" 
       elevation="2"
       :style="{ display: isFullscreen ? 'none' : 'flex' }"
-      style="flex-direction: column; height: 100vh;"
+      style="border-bottom: 1px solid #e2e8f0;"
     >
-      <v-list-item
-        prepend-avatar="https://randomuser.me/api/portraits/men/85.jpg"
-        :title="refereeName"
-        subtitle=""
-        nav
-      >
-
-      </v-list-item>
-    
-      <v-divider></v-divider>
-
-      <div class="sidebar-content">
-        <v-list density="compact" nav class="sidebar-main-menu">
-          <v-list-item 
-            prepend-icon="mdi-home"   
-            title="主页" 
-            value="home" 
-            to="/home"
-            exact
-          ></v-list-item>
-          <v-list-group value="replay-management" fluid>
-            <template v-slot:activator="{ props }">
-              <v-list-item
-                prepend-icon="mdi-play-box-multiple"
-                title="回放处理"
-                v-bind="props"
-              ></v-list-item>
-            </template>
-            
-            <v-list-item
-              prepend-icon="mdi-play"
-              title="实时回放"
-              value="replay"
-              to="/replay"
-              exact
-              style="padding-left: 32px !important;"
-            ></v-list-item>
-            <v-list-item
-              prepend-icon="mdi-video-plus"
-              title="新增赛事"
-              value="new-match"
-              to="/new-match"
-              exact
-              style="padding-left: 32px !important;"
-            ></v-list-item>
-          </v-list-group>
-          <v-list-item 
-            prepend-icon="mdi-database" 
-            title="数据备份" 
-            value="backup" 
-            to="/backup"
-            exact
-          ></v-list-item>
-          <v-list-item 
-            prepend-icon="mdi-file-pdf-box" 
-            title="报告PDF" 
-            value="report" 
-            to="/report"
-            exact
-          ></v-list-item>
-          <v-list-item 
-            prepend-icon="mdi-history" 
-            title="数据回溯" 
-            value="history" 
-            to="/history"
-            exact
-          ></v-list-item>
-          <v-list-item 
-            prepend-icon="mdi-alert-circle" 
-            title="争议复核" 
-            value="dispute" 
-            to="/dispute"
-            exact
-          ></v-list-item>
-          <v-list-item 
-            prepend-icon="mdi-bell" 
-            title="消息通知" 
-            value="notification" 
-            to="/notification"
-            exact
-          ></v-list-item>
-
-          <v-list-item 
-            prepend-icon="mdi-medal" 
-            title="大屏评分" 
-            value="final-score-display" 
-            to="/final-score-display"
-            exact
-          ></v-list-item>
-          <v-list-group value="permission" fluid>
-            <template v-slot:activator="{ props }">
-              <v-list-item
-                prepend-icon="mdi-shield-account"
-                title="权限与规则"
-                v-bind="props"
-              ></v-list-item>
-            </template>
-            
-            <v-list-item
-              prepend-icon="mdi-account-key"
-              title="权限配置"
-              value="permission-config"
-              to="/permission"
-              exact
-              style="padding-left: 32px !important;"
-            ></v-list-item>
-            <v-list-item
-              prepend-icon="mdi-tune-variant"
-              title="评分规则"
-              value="scoring-rules"
-              to="/scoring-rules"
-              exact
-              style="padding-left: 32px !important;"
-            ></v-list-item>
-            <v-list-item
-              prepend-icon="mdi-book-open-variant"
-              title="规则库"
-              value="rule-library"
-              to="/rule-library"
-              exact
-              style="padding-left: 32px !important;"
-            ></v-list-item>
-          </v-list-group>
-        </v-list>
-        
-        <div class="sidebar-footer">
-          <v-divider></v-divider>
-          <v-list-item 
-            prepend-icon="mdi-logout" 
-            title="退出登录" 
-            @click="logout"
-            class="logout-item"
-          ></v-list-item>
-        </div>
-      </div>
-    </v-navigation-drawer>
-
-    <!-- 顶部工具栏 -->
-    <v-app-bar color="#42b883" dark :style="{ display: isFullscreen ? 'none' : 'flex' }">
-      <v-app-bar-nav-icon @click="toggleDrawer"></v-app-bar-nav-icon>
-      <v-app-bar-title>武术裁判评分系统</v-app-bar-title>
+      <v-app-bar-title class="text-h6 font-weight-bold" style="color: #2c3e50;">
+        武术裁判评分系统
+      </v-app-bar-title>
       
       <v-spacer></v-spacer>
+      
+      <!-- 主导航菜单 -->
+      <v-btn-group class="mr-4" variant="text">
+        <v-btn to="/home" exact style="color: #2c3e50;">
+          <v-icon left color="#42b883">mdi-home</v-icon>
+          主页
+        </v-btn>
+        
+        <!-- 回放处理下拉菜单 -->
+        <v-menu offset-y>
+          <template v-slot:activator="{ props }">
+            <v-btn v-bind="props" style="color: #2c3e50;">
+              <v-icon left color="#42b883">mdi-video</v-icon>
+              回放处理
+              <v-icon right>mdi-menu-down</v-icon>
+            </v-btn>
+          </template>
+          <v-list>
+            <v-list-item to="/replay" exact>
+              <v-icon left color="#42b883">mdi-play-circle</v-icon>
+              实时回放
+            </v-list-item>
+            <v-list-item to="/history" exact>
+              <v-icon left color="#42b883">mdi-history</v-icon>
+              历史回放
+            </v-list-item>
+          </v-list>
+        </v-menu>
+        
+        <v-btn to="/new-match" exact style="color: #2c3e50;">
+          <v-icon left color="#42b883">mdi-plus-box</v-icon>
+          新建比赛
+        </v-btn>
+        
+        <v-btn to="/backup" exact style="color: #2c3e50;">
+          <v-icon left color="#42b883">mdi-database</v-icon>
+          数据回溯
+        </v-btn>
+        
+        <v-btn to="/dispute" exact style="color: #2c3e50;">
+          <v-icon left color="#42b883">mdi-alert-circle</v-icon>
+          争议复核
+        </v-btn>
+        
+        <v-btn to="/notification" exact style="color: #2c3e50;">
+          <v-icon left color="#42b883">mdi-bell</v-icon>
+          消息通知
+        </v-btn>
+        
+        <v-btn to="/final-score-display" exact style="color: #2c3e50;">
+          <v-icon left color="#42b883">mdi-medal</v-icon>
+          大屏评分
+        </v-btn>
+        
+        <!-- 权限与规则下拉菜单 -->
+        <v-menu offset-y>
+          <template v-slot:activator="{ props }">
+            <v-btn v-bind="props" style="color: #2c3e50;">
+              <v-icon left color="#42b883">mdi-shield-account</v-icon>
+              权限与规则
+              <v-icon right>mdi-menu-down</v-icon>
+            </v-btn>
+          </template>
+          <v-list>
+            <v-list-item to="/permission" exact>
+              <v-icon left color="#42b883">mdi-account-key</v-icon>
+              权限配置
+            </v-list-item>
+            <v-list-item to="/scoring-rules" exact>
+              <v-icon left color="#42b883">mdi-tune-variant</v-icon>
+              评分规则
+            </v-list-item>
+            <v-list-item to="/rule-library" exact>
+              <v-icon left color="#42b883">mdi-book-open-variant</v-icon>
+              规则库
+            </v-list-item>
+          </v-list>
+        </v-menu>
+      </v-btn-group>
+      
+      <v-spacer></v-spacer>
+      
+
       
       <!-- 消息通知按钮 -->
       <v-menu
@@ -164,11 +105,11 @@
         max-width="400"
       >
         <template v-slot:activator="{ props }">
-          <v-btn icon v-bind="props" @click="markAllAsRead">
+          <v-btn icon v-bind="props" @click="markAllAsRead" style="color: #2c3e50;">
             <v-icon>mdi-bell</v-icon>
             <v-badge 
               v-if="unreadCount > 0" 
-              color="red" 
+              color="#42b883" 
               :content="unreadCount" 
               overlap
             ></v-badge>
@@ -241,7 +182,7 @@
       <!-- 用户头像按钮 -->
       <v-menu offset-y>
         <template v-slot:activator="{ props }">
-          <v-btn icon v-bind="props">
+          <v-btn icon v-bind="props" style="color: #2c3e50;">
             <v-icon>mdi-account-circle</v-icon>
           </v-btn>
         </template>
@@ -252,7 +193,7 @@
               <v-icon size="32">mdi-account</v-icon>
             </v-avatar>
             <div class="mt-2">
-              <div class="text-subtitle-1 font-weight-medium">管理员</div>
+              <div class="text-subtitle-1 font-weight-medium">{{ refereeName }}</div>
               <div class="text-caption text-grey">超级管理员</div>
             </div>
           </v-card-text>
@@ -359,8 +300,6 @@ const viewAllNotifications = () => {
   notificationMenu.value = false
 }
 
-const drawer = ref(true)
-const rail = ref(false)
 const router = useRouter()
 const windowWidth = ref(window.innerWidth)
 
@@ -375,10 +314,6 @@ const updateWidth = () => {
 
 onMounted(() => {
   window.addEventListener('resize', updateWidth)
-  // 初始化时根据窗口大小设置状态
-  if (isMobile.value) {
-    drawer.value = false
-  }
   // 获取裁判姓名
   getRefereeName()
   
@@ -394,22 +329,6 @@ onUnmounted(() => {
 // 处理全屏切换
 const handleFullscreenToggle = (event) => {
   isFullscreen.value = event.detail.isFullscreen
-  
-  // 隐藏/显示侧边栏和顶部栏
-  if (isFullscreen.value) {
-    drawer.value = false
-  } else {
-    // 恢复原来的状态
-    drawer.value = !isMobile.value
-  }
-}
-
-const toggleDrawer = () => {
-  if (isMobile.value) {
-    drawer.value = !drawer.value
-  } else {
-    rail.value = !rail.value
-  }
 }
 
 const logout = () => {
@@ -424,20 +343,11 @@ const logout = () => {
 </script>
 
 <style scoped>
-.judge-sidebar {
-  background: white;
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
-  border-right: 1px solid #e0e0e0;
-  z-index: 1000;
-  height: 100vh !important;
-  overflow: hidden !important; /* 完全隐藏滚动条 */
-}
-
 .judge-main {
   background-color: #f0f2f5;
   background-image: linear-gradient(135deg, #f0f2f5 0%, #e4e7ed 100%);
   min-height: 100vh;
-  transition: padding-left 0.3s ease;
+  padding-top: 64px; /* 为顶部栏留出空间 */
 }
 
 .content-container {
@@ -451,10 +361,47 @@ const logout = () => {
   font-weight: 500;
 }
 
-/* 消息通知样式 */
+/* 顶部导航按钮样式 - 与网页风格统一 */
+:deep(.v-btn-group .v-btn) {
+  height: 48px !important;
+  padding: 0 16px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  border-radius: 8px !important;
+  margin: 0 2px !important;
+  transition: all 0.3s ease !important;
+}
+
+:deep(.v-btn-group .v-btn:hover) {
+  background-color: rgba(66, 184, 131, 0.08) !important;
+  color: #42b883 !important;
+}
+
+:deep(.v-btn-group .v-btn--active) {
+  background-color: rgba(66, 184, 131, 0.15) !important;
+  color: #42b883 !important;
+  border-bottom: 2px solid #42b883 !important;
+}
+
+/* 顶部栏标题样式 */
+:deep(.v-app-bar-title) {
+  font-weight: 600 !important;
+  letter-spacing: 0.5px !important;
+}
+
+/* 图标按钮悬浮效果 */
+:deep(.v-app-bar .v-btn--icon:hover) {
+  background-color: rgba(66, 184, 131, 0.08) !important;
+  color: #42b883 !important;
+  transform: translateY(-1px) !important;
+}
+
+/* 消息通知样式 - 与网页风格统一 */
 .notification-card {
   max-height: 500px;
   overflow-y: auto;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
 }
 
 .notification-header {
@@ -464,6 +411,8 @@ const logout = () => {
   padding: 16px !important;
   font-size: 16px;
   font-weight: 600;
+  color: #2c3e50;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
 }
 
 .notification-content {
@@ -472,12 +421,16 @@ const logout = () => {
 
 .notification-item {
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.3s ease;
   border-left: 3px solid transparent;
+  border-radius: 8px !important;
+  margin: 4px 8px !important;
 }
 
 .notification-item:hover {
   background-color: rgba(66, 184, 131, 0.08);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .notification-item.unread {
@@ -502,77 +455,51 @@ const logout = () => {
   color: rgba(0, 0, 0, 0.5);
 }
 
-/* 固定头像大小 */
-:deep(.v-list-item__prepend) .v-avatar {
-  width: 40px !important;
-  height: 40px !important;
-  flex: 0 0 40px !important;
+/* 下拉菜单样式优化 */
+:deep(.v-menu .v-list) {
+  border-radius: 12px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+  padding: 8px 0 !important;
 }
 
-:deep(.v-list-item--nav) .v-list-item__prepend .v-avatar {
-  width: 40px !important;
-  height: 40px !important;
-  flex: 0 0 40px !important;
+:deep(.v-menu .v-list-item) {
+  border-radius: 8px !important;
+  margin: 2px 8px !important;
+  transition: all 0.3s ease !important;
 }
 
-/* 侧边栏布局样式 */
-.sidebar-content {
-  display: flex;
-  flex-direction: column;
-  height: calc(100vh - 64px); /* 减去头像区域的高度 */
-  overflow: hidden !important; /* 完全隐藏滚动条 */
+:deep(.v-menu .v-list-item:hover) {
+  background-color: rgba(66, 184, 131, 0.08) !important;
+  transform: translateY(-1px) !important;
 }
 
-.sidebar-main-menu {
-  flex: 1;
-  overflow: hidden !important; /* 完全隐藏滚动条 */
-  padding-bottom: 8px; /* 添加一些底部间距 */
-}
-
-.sidebar-footer {
-  flex-shrink: 0;
-  background: white;
-  border-top: 1px solid #e0e0e0;
-  margin-top: auto; /* 确保在底部 */
-}
-
-.logout-item {
-  background: white;
-  font-size: 14px !important; /* 统一字体大小 */
-  font-weight: 500 !important;
-}
-
-.logout-item:hover {
-  background-color: rgba(239, 83, 80, 0.08) !important;
-  color: #ef5353 !important;
-}
-
-/* 统一所有菜单项的字体大小 */
-:deep(.v-list-item-title) {
-  font-size: 14px !important;
-  font-weight: 500 !important;
-}
-
-:deep(.v-list-item--nav) {
-  font-size: 14px !important;
+/* 用户菜单样式优化 */
+:deep(.v-card) {
+  border-radius: 12px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
 }
 
 /* 响应式布局优化 */
 @media (max-width: 1264px) {
-  .judge-main {
-    padding-left: 0 !important;
-  }
-  
   .content-container {
     padding: 16px;
   }
   
-  .judge-sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    z-index: 1001;
+  /* 移动端隐藏部分导航按钮文字 */
+  @media (max-width: 768px) {
+    :deep(.v-btn-group .v-btn) {
+      padding: 0 8px !important;
+      font-size: 12px !important;
+    }
+    
+    :deep(.v-btn-group .v-btn .v-icon--left) {
+      margin-right: 4px !important;
+    }
+    
+    /* 移动端优化顶部栏 */
+    :deep(.v-app-bar-title) {
+      font-size: 1.1rem !important;
+    }
   }
 }
 </style>

@@ -52,6 +52,7 @@
                 <tr>
                   <th class="text-left">裁判姓名</th>
                   <th class="text-center">裁判角色</th>
+                  <th class="text-right">质量分</th>
                   <th class="text-right">难度分</th>
                   <th class="text-right">完成分</th>
                   <th class="text-right">综合评分</th>
@@ -69,6 +70,7 @@
                       {{ judge.role }}
                     </v-chip>
                   </td>
+                  <td class="text-right">{{ judge.qualityScore.toFixed(1) }}</td>
                   <td class="text-right">{{ judge.difficultyScore.toFixed(1) }}</td>
                   <td class="text-right">{{ judge.completionScore.toFixed(1) }}</td>
                   <td class="text-right font-weight-bold">{{ judge.totalScore.toFixed(1) }}</td>
@@ -76,6 +78,7 @@
                 <!-- 平均分汇总行 -->
                 <tr class="average-row">
                   <td colspan="2"><strong>平均分</strong></td>
+                  <td class="text-right"><strong>{{ averageQualityScore.toFixed(1) }}</strong></td>
                   <td class="text-right"><strong>{{ averageDifficultyScore.toFixed(1) }}</strong></td>
                   <td class="text-right"><strong>{{ averageCompletionScore.toFixed(1) }}</strong></td>
                   <td class="text-right"><strong>{{ averageTotalScore.toFixed(1) }}</strong></td>
@@ -144,48 +147,53 @@ onUnmounted(() => {
 })
 
 // 裁判评分数据
-const judgeScores = ref([
-  {
-    name: '张裁判',
-    role: '主裁判',
-    difficultyScore: 8.5,
-    completionScore: 9.0,
-    totalScore: 17.5,
-    status: '已评分'
-  },
-  {
-    name: '李裁判',
-    role: '副裁判',
-    difficultyScore: 8.2,
-    completionScore: 8.8,
-    totalScore: 17.0,
-    status: '已评分'
-  },
-  {
-    name: '王裁判',
-    role: '副裁判',
-    difficultyScore: 8.7,
-    completionScore: 9.1,
-    totalScore: 17.8,
-    status: '已评分'
-  },
-  {
-    name: '赵裁判',
-    role: '副裁判',
-    difficultyScore: 8.3,
-    completionScore: 8.9,
-    totalScore: 17.2,
-    status: '已评分'
-  },
-  {
-    name: '陈裁判',
-    role: '副裁判',
-    difficultyScore: 8.6,
-    completionScore: 8.7,
-    totalScore: 17.3,
-    status: '已评分'
-  }
-])
+  const judgeScores = ref([
+    {
+      name: '张裁判',
+      role: '主裁判',
+      qualityScore: 8.3,
+      difficultyScore: 8.5,
+      completionScore: 9.0,
+      totalScore: 17.5,
+      status: '已评分'
+    },
+    {
+      name: '李裁判',
+      role: '副裁判',
+      qualityScore: 8.1,
+      difficultyScore: 8.2,
+      completionScore: 8.8,
+      totalScore: 17.0,
+      status: '已评分'
+    },
+    {
+      name: '王裁判',
+      role: '副裁判',
+      qualityScore: 8.6,
+      difficultyScore: 8.7,
+      completionScore: 9.1,
+      totalScore: 17.8,
+      status: '已评分'
+    },
+    {
+      name: '赵裁判',
+      role: '副裁判',
+      qualityScore: 7.9,
+      difficultyScore: 8.3,
+      completionScore: 8.9,
+      totalScore: 17.2,
+      status: '已评分'
+    },
+    {
+      name: '陈裁判',
+      role: '副裁判',
+      qualityScore: 8.2,
+      difficultyScore: 8.6,
+      completionScore: 8.7,
+      totalScore: 17.3,
+      status: '已评分'
+    }
+  ])
 
 // 获取角色颜色
 const getRoleColor = (role) => {
@@ -209,6 +217,13 @@ const getStatusColor = (status) => {
 }
 
 // 计算属性 - 裁判评分汇总数据
+const averageQualityScore = computed(() => {
+  const validScores = judgeScores.value.filter(judge => judge.status === '已评分')
+  if (validScores.length === 0) return 0
+  const sum = validScores.reduce((sum, judge) => sum + judge.qualityScore, 0)
+  return sum / validScores.length
+})
+
 const averageDifficultyScore = computed(() => {
   const validScores = judgeScores.value.filter(judge => judge.status === '已评分')
   if (validScores.length === 0) return 0
@@ -296,7 +311,7 @@ const averageTotalScore = computed(() => {
 }
 
 .final-score {
-  font-size: 3.5rem;
+  font-size: 5rem;
   font-weight: bold;
   color: #42b883;
 }
@@ -424,11 +439,14 @@ const averageTotalScore = computed(() => {
     font-weight: 600;
     color: #333;
     border-bottom: 2px solid #e0e0e0;
+    font-size: 1.3rem;
+    padding: 16px 20px;
   }
   
   .judge-score-table td {
     border-bottom: 1px solid #f0f0f0;
-    padding: 12px 16px;
+    padding: 16px 20px;
+    font-size: 1.2rem;
   }
   
   .judge-score-table tbody tr:hover {

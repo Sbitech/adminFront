@@ -36,37 +36,10 @@
 
           <!-- 第一行：动作控制 + 主视频 + 比赛场次 -->
           <v-row>
-            <!-- 左侧动作控制器和视角预览 -->
+            <!-- 左侧视角预览和实时评分 -->
             <v-col cols="12" lg="2" class="d-flex flex-column">
-              <v-card class="flex-grow-1 d-flex flex-column replay-card" style="min-height: 200px;">
-                <v-card-title class="text-subtitle-1 font-weight-medium">
-                  动作控制
-                </v-card-title>
-                <v-card-text class="flex-grow-1 d-flex flex-column justify-center">
-                  <div class="text-center mb-4">
-                    <div class="text-h6">{{ actionTimestamps[currentActionIndex]?.name || '准备动作' }}</div>
-                    <div class="text-caption">{{ formatTime(actionTimestamps[currentActionIndex]?.start || 0) }} - {{
-                      formatTime(actionTimestamps[currentActionIndex]?.end || 0) }}</div>
-                    <div class="text-caption">第 {{ currentActionIndex + 1 }} / {{ actionTimestamps.length }} 个动作</div>
-                  </div>
-                  <div class="d-flex flex-column align-center">
-                    <v-btn color="primary" prepend-icon="mdi-skip-previous" @click="previousAction"
-                      :disabled="currentActionIndex <= 0" class="mb-2" style="min-width: 140px;">
-                      上一个动作
-                    </v-btn>
-                    <v-btn color="primary" prepend-icon="mdi-skip-next" @click="nextAction"
-                      :disabled="currentActionIndex >= actionTimestamps.length - 1" class="mb-2" style="min-width: 140px;">
-                      下一个动作
-                    </v-btn>
-                    <v-btn color="secondary" prepend-icon="mdi-play" @click="playCurrentAction" style="min-width: 140px;">
-                      播放当前
-                    </v-btn>
-                  </div>
-                </v-card-text>
-              </v-card>
-
               <!-- 视角预览区域 -->
-              <v-card class="flex-grow-1 mt-3 replay-card">
+              <v-card class="flex-grow-1 replay-card">
                 <v-card-title class="text-subtitle-1 font-weight-medium">
                   视角预览
                 </v-card-title>
@@ -111,6 +84,49 @@
                   </v-row>
                 </v-card-text>
               </v-card>
+
+              <!-- 实时评分区域 -->
+              <v-card elevation="1" class="real-time-score-panel mt-3">
+                <v-card-title class="text-subtitle-1 font-weight-medium">
+                  实时评分
+                </v-card-title>
+                <v-card-text>
+                  <div class="score-display-grid">
+                    <div class="score-item difficulty-score">
+                      <div class="score-header">
+                        <v-icon size="20" color="info">mdi-trending-up</v-icon>
+                        <span class="score-title">难度分</span>
+                      </div>
+                      <div class="score-value-container">
+                        <span class="score-number">{{ realTimeScores.difficulty.toFixed(1) }}</span>
+                        <span class="score-total">/10</span>
+                      </div>
+                    </div>
+
+                    <div class="score-item completion-score">
+                      <div class="score-header">
+                        <v-icon size="20" color="success">mdi-check-circle-outline</v-icon>
+                        <span class="score-title">完成分</span>
+                      </div>
+                      <div class="score-value-container">
+                        <span class="score-number">{{ realTimeScores.completion.toFixed(1) }}</span>
+                        <span class="score-total">/10</span>
+                      </div>
+                    </div>
+
+                    <div class="score-item final-score-item">
+                      <div class="score-header">
+                        <v-icon size="20" color="primary">mdi-star-circle-outline</v-icon>
+                        <span class="score-title">最终得分</span>
+                      </div>
+                      <div class="score-value-container final">
+                        <span class="score-number final">{{ finalScore }}</span>
+                        <span class="score-total">/10</span>
+                      </div>
+                    </div>
+                  </div>
+                </v-card-text>
+              </v-card>
             </v-col>
 
             <!-- 中间主视频区域 -->
@@ -131,269 +147,141 @@
               </v-card>
             </v-col>
 
-            <!-- 第二行：实时评分和AI分析 -->
+            <!-- 第二行：动作控制和AI分析 -->
             <v-row>
               <v-col cols="12">
                 <v-card class="score-analysis-card" elevation="0">
                   <v-card-text >
                     <v-row>
-                      <!-- 实时评分框 -->
+                      <!-- 动作控制框 -->
                       <v-col cols="12" lg="3" md="4" sm="6">
-                        <v-card elevation="1" class="real-time-score-panel">
+                        <v-card elevation="1" class="action-control-panel">
                           <v-card-title class="text-subtitle-1 font-weight-medium">
-                            实时评分
+                            动作控制
                           </v-card-title>
                           <v-card-text>
-                            <div class="score-display-grid">
-                              <div class="score-item difficulty-score">
-                                <div class="score-header">
-                                  <v-icon size="20" color="info">mdi-trending-up</v-icon>
-                                  <span class="score-title">难度分</span>
-                                </div>
-                                <div class="score-value-container">
-                                  <span class="score-number">{{ realTimeScores.difficulty.toFixed(1) }}</span>
-                                  <span class="score-total">/10</span>
-                                </div>
-                              </div>
-
-                              <div class="score-item completion-score">
-                                <div class="score-header">
-                                  <v-icon size="20" color="success">mdi-check-circle-outline</v-icon>
-                                  <span class="score-title">完成分</span>
-                                </div>
-                                <div class="score-value-container">
-                                  <span class="score-number">{{ realTimeScores.completion.toFixed(1) }}</span>
-                                  <span class="score-total">/10</span>
-                                </div>
-                              </div>
-
-                              <div class="score-item final-score-item">
-                                <div class="score-header">
-                                  <v-icon size="20" color="primary">mdi-star-circle-outline</v-icon>
-                                  <span class="score-title">最终得分</span>
-                                </div>
-                                <div class="score-value-container final">
-                                  <span class="score-number final">{{ finalScore }}</span>
-                                  <span class="score-total">/10</span>
-                                </div>
-                              </div>
+                            <div class="text-center mb-4">
+                              <div class="text-h6">{{ actionTimestamps[currentActionIndex]?.name || '准备动作' }}</div>
+                              <div class="text-caption">{{ formatTime(actionTimestamps[currentActionIndex]?.start || 0) }} - {{
+                                formatTime(actionTimestamps[currentActionIndex]?.end || 0) }}</div>
+                              <div class="text-caption">第 {{ currentActionIndex + 1 }} / {{ actionTimestamps.length }} 个动作</div>
+                            </div>
+                            <div class="d-flex flex-column align-center">
+                              <v-btn color="primary" prepend-icon="mdi-skip-previous" @click="previousAction"
+                                :disabled="currentActionIndex <= 0" class="mb-2" style="min-width: 140px;">
+                                上一个动作
+                              </v-btn>
+                              <v-btn color="primary" prepend-icon="mdi-skip-next" @click="nextAction"
+                                :disabled="currentActionIndex >= actionTimestamps.length - 1" class="mb-2" style="min-width: 140px;">
+                                下一个动作
+                              </v-btn>
+                              <v-btn color="secondary" prepend-icon="mdi-play" @click="playCurrentAction" style="min-width: 140px;">
+                                播放当前
+                              </v-btn>
                             </div>
                           </v-card-text>
                         </v-card>
                       </v-col>
 
-                      <!-- AI评分和分析功能 -->
+                      <!-- 招式裁判评分表格 -->
                       <v-col cols="12" lg="9" md="8" sm="6">
-                        <v-card elevation="1" class="ai-score-panel">
+                        <v-card elevation="1" class="move-judge-scoring-table">
                           <v-card-title class="text-subtitle-1 font-weight-medium">
-                            AI评分与分析
+                            招式裁判评分
                           </v-card-title>
-                          <v-card-text>
-                            <v-row>
-                              <!-- AI评分显示 -->
-                              <v-col cols="12" md="4">
-                                <v-card class="ai-score-display" elevation="0">
-                                  <div class="ai-score-header">
-                                    <v-icon size="18" color="purple">mdi-robot</v-icon>
-                                    <span class="ai-score-title">AI评分</span>
-                                  </div>
-                                  <div class="ai-score-value">
-                                    <span class="ai-score-number">{{ aiScore.toFixed(1) }}</span>
-                                    <span class="ai-score-total">/10</span>
-                                  </div>
-
-                                </v-card>
-                              </v-col>
-
-                              <!-- 功能按钮 -->
-                              <v-col cols="12" md="8">
-                                <v-row class="function-buttons">
-                                  <v-col cols="12" sm="4">
-                                    <v-btn block color="primary" variant="tonal" size="default"
-                                      prepend-icon="mdi-human-edit" @click="toggleManualScoring" class="function-btn">
-                                      {{ showManualScoringPanel ? '收起评分' : '人工评分' }}
-                                    </v-btn>
-                                  </v-col>
-
-                                  <v-col cols="12" sm="4">
-                                    <v-btn block color="success" variant="tonal" size="default"
-                                      prepend-icon="mdi-chart-line" @click="openAIAnalysis" class="function-btn">
-                                      {{ showAIAnalysisResult ? '收起分析' : 'AI分析' }}
-                                    </v-btn>
-                                  </v-col>
-                                </v-row>
-                              </v-col>
-                            </v-row>
-
-                            <!-- AI分析结果展示 -->
-                            <v-expand-transition>
-                              <div v-if="showAIAnalysisResult" class="ai-analysis-result">
-                                <v-divider class="my-4"></v-divider>
-                                <v-card elevation="0" class="analysis-content-card">
-                                  <v-card-text class="pa-4">
-                                    <div class="analysis-header">
-                                      <span class="analysis-title text-subtitle-2 font-weight-medium">招式评分详情</span>
+                          <v-card-text class="pa-0">
+                            <v-table class="move-scoring-table" density="compact">
+                              <thead>
+                                <tr>
+                                  <th class="text-left font-weight-medium">编号</th>
+                                  <th class="text-left font-weight-medium">招式名</th>
+                                  <th class="text-center font-weight-medium">张裁判</th>
+                                  <th class="text-center font-weight-medium">李裁判</th>
+                                  <th class="text-center font-weight-medium">王裁判</th>
+                                  <th class="text-center font-weight-medium">分值</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr v-for="(move, index) in moveJudgeScores" :key="move.id">
+                                  <td class="text-left">{{ index + 1 }}</td>
+                                  <td class="text-left">{{ move.moveName }}</td>
+                                  <td class="text-center">
+                                    <div v-if="move.judges[0].name === currentUser.name">
+                                      <v-select
+                                        v-model="move.judges[0].status"
+                                        :items="['未完成', '完成']"
+                                        @change="updateJudgeStatus(move.id, 0, move.judges[0].status)"
+                                        class="status-select"
+                                        density="compact"
+                                        hide-details
+                                        variant="outlined"
+                                        :disabled="allScoresConfirmed"
+                                      ></v-select>
                                     </div>
-                                    
-                                    <!-- 招式评分表格 -->
-                                    <v-table class="move-scoring-table mt-3" density="compact">
-                                      <thead>
-                                        <tr>
-                                          <th class="text-left">评分项目</th>
-                                          <th class="text-center">实时评分</th>
-                                          <th class="text-center">AI评分</th>
-                                          <th class="text-center">差异</th>
-                                          <th class="text-left">评分说明</th>
-                                        </tr>
-                                      </thead>
-                                      <tbody>
-                                        <tr>
-                                          <td><strong>难度分</strong></td>
-                                          <td class="text-center">{{ realTimeScores.difficulty.toFixed(1) }}</td>
-                                          <td class="text-center">{{ aiDifficultyScore.toFixed(1) }}</td>
-                                          <td class="text-center">
-                                            <v-chip 
-                                              size="small" 
-                                              :color="Math.abs(realTimeScores.difficulty - aiDifficultyScore) < 0.5 ? 'success' : Math.abs(realTimeScores.difficulty - aiDifficultyScore) < 1.0 ? 'warning' : 'error'"
-                                              variant="tonal"
-                                            >
-                                              {{ (realTimeScores.difficulty - aiDifficultyScore).toFixed(1) }}
-                                            </v-chip>
-                                          </td>
-                                          <td>动作难度系数及完成复杂度评估</td>
-                                        </tr>
-                                        <tr>
-                                          <td><strong>完成分</strong></td>
-                                          <td class="text-center">{{ realTimeScores.completion.toFixed(1) }}</td>
-                                          <td class="text-center">{{ aiCompletionScore.toFixed(1) }}</td>
-                                          <td class="text-center">
-                                            <v-chip 
-                                              size="small" 
-                                              :color="Math.abs(realTimeScores.completion - aiCompletionScore) < 0.5 ? 'success' : Math.abs(realTimeScores.completion - aiCompletionScore) < 1.0 ? 'warning' : 'error'"
-                                              variant="tonal"
-                                            >
-                                              {{ (realTimeScores.completion - aiCompletionScore).toFixed(1) }}
-                                            </v-chip>
-                                          </td>
-                                          <td>动作完成度及技术规范程度评估</td>
-                                        </tr>
-                                        <tr>
-                                          <td><strong>技术规范</strong></td>
-                                          <td class="text-center">-</td>
-                                          <td class="text-center">{{ technicalScore }}</td>
-                                          <td class="text-center">-</td>
-                                          <td>动作技术标准及规范性评估</td>
-                                        </tr>
-                                        <tr>
-                                          <td><strong>动作流畅</strong></td>
-                                          <td class="text-center">-</td>
-                                          <td class="text-center">{{ fluencyScore }}</td>
-                                          <td class="text-center">-</td>
-                                          <td>动作连贯性及节奏感评估</td>
-                                        </tr>
-                                      </tbody>
-                                    </v-table>
-                                    
-                                    <!-- AI分析总结 -->
-                                    <div class="analysis-summary mt-4">
-                                      <div class="analysis-content">{{ aiAnalysisResult }}</div>
-                                    </div>
-                                  </v-card-text>
-                                </v-card>
-                              </div>
-                            </v-expand-transition>
-
-                            <!-- 人工评分面板 -->
-                            <v-expand-transition>
-                              <div v-if="showManualScoringPanel" class="manual-scoring-panel">
-                                <v-divider class="my-4"></v-divider>
-                                <v-card elevation="0" class="manual-scoring-content">
-                                  <v-card-text class="pa-4">
-                                    <div class="manual-scoring-header">
-                                      <span class="manual-scoring-title text-subtitle-2 font-weight-medium">人工评分</span>
-                                      <v-chip size="small" color="primary" variant="flat">
-                                        专业评分
+                                    <div v-else>
+                                      <v-chip :color="move.judges[0].status === '完成' ? 'success' : 'error'" class="px-2">
+                                        {{ move.judges[0].status }}
                                       </v-chip>
                                     </div>
-                                    <v-row class="mt-3">
-                                      <v-col cols="12" md="4">
-                                        <div class="scoring-control">
-                                          <div class="section-header mb-3">
-                                            <span class="section-title text-subtitle-2 font-weight-medium">难度分</span>
-                                            <v-chip size="small" color="primary" variant="tonal">
-                                              精确到0.1分
-                                            </v-chip>
-                                          </div>
-                                          <div class="score-display mb-3">
-                                            <div class="current-score-circle">
-                                              <div class="score-inner-circle">
-                                                <div class="score-number-display">{{ manualDifficultyScore.toFixed(1) }}</div>
-                                                <div class="score-label-display">难度分</div>
-                                              </div>
-                                            </div>
-                                          </div>
-                                          <v-slider v-model="manualDifficultyScore" :min="0" :max="10" :step="0.1" color="primary"
-                                            track-color="grey-lighten-2" thumb-size="20" track-size="6"
-                                            class="compact-score-slider" hide-details></v-slider>
-                                          <div class="score-controls mt-2">
-                                            <v-btn icon="mdi-minus" size="x-small" variant="tonal"
-                                              @click="manualDifficultyScore = Math.max(0, manualDifficultyScore - 0.5)"></v-btn>
-                                            <span class="score-range mx-2">{{ manualDifficultyScore.toFixed(1) }} / 10</span>
-                                            <v-btn icon="mdi-plus" size="x-small" variant="tonal"
-                                              @click="manualDifficultyScore = Math.min(10, manualDifficultyScore + 0.5)"></v-btn>
-                                          </div>
-                                        </div>
-                                      </v-col>
-                                      <v-col cols="12" md="4">
-                                        <div class="scoring-control">
-                                          <div class="section-header mb-3">
-                                            <span class="section-title text-subtitle-2 font-weight-medium">完成分</span>
-                                            <v-chip size="small" color="success" variant="tonal">
-                                              精确到0.1分
-                                            </v-chip>
-                                          </div>
-                                          <div class="score-display mb-3">
-                                            <div class="current-score-circle">
-                                              <div class="score-inner-circle">
-                                                <div class="score-number-display">{{ manualCompletionScore.toFixed(1) }}</div>
-                                                <div class="score-label-display">完成分</div>
-                                              </div>
-                                            </div>
-                                          </div>
-                                          <v-slider v-model="manualCompletionScore" :min="0" :max="10" :step="0.1" color="success"
-                                            track-color="grey-lighten-2" thumb-size="20" track-size="6"
-                                            class="compact-score-slider" hide-details></v-slider>
-                                          <div class="score-controls mt-2">
-                                            <v-btn icon="mdi-minus" size="x-small" variant="tonal"
-                                              @click="manualCompletionScore = Math.max(0, manualCompletionScore - 0.5)"></v-btn>
-                                            <span class="score-range mx-2">{{ manualCompletionScore.toFixed(1) }} / 10</span>
-                                            <v-btn icon="mdi-plus" size="x-small" variant="tonal"
-                                              @click="manualCompletionScore = Math.min(10, manualCompletionScore + 0.5)"></v-btn>
-                                          </div>
-                                        </div>
-                                      </v-col>
-                                      <v-col cols="12" md="4">
-                                        <div class="scoring-reason">
-                                          <div class="section-header mb-3">
-                                            <span class="section-title text-subtitle-2 font-weight-medium">评分说明</span>
-                                          </div>
-                                          <v-textarea v-model="scoringReason" placeholder="请输入评分理由或建议..." rows="3"
-                                            variant="outlined" density="compact" hide-details></v-textarea>
-                                          <div class="scoring-actions mt-3">
-                                            <v-btn color="primary" variant="elevated" size="small"
-                                              @click="saveManualScore" :loading="savingScore" block>
-                                              <v-icon start>mdi-check</v-icon>
-                                              确认评分
-                                            </v-btn>
-                                          </div>
-                                        </div>
-                                      </v-col>
-                                    </v-row>
-                                  </v-card-text>
-                                </v-card>
-                              </div>
-                            </v-expand-transition>
+                                  </td>
+                                  <td class="text-center">
+                                    <div v-if="move.judges[1].name === currentUser.name">
+                                      <v-select
+                                        v-model="move.judges[1].status"
+                                        :items="['未完成', '完成']"
+                                        @change="updateJudgeStatus(move.id, 1, move.judges[1].status)"
+                                        class="status-select"
+                                        density="compact"
+                                        hide-details
+                                        variant="outlined"
+                                        :disabled="allScoresConfirmed"
+                                      ></v-select>
+                                    </div>
+                                    <div v-else>
+                                      <v-chip :color="move.judges[1].status === '完成' ? 'success' : 'error'" class="px-2">
+                                        {{ move.judges[1].status }}
+                                      </v-chip>
+                                    </div>
+                                  </td>
+                                  <td class="text-center">
+                                    <div v-if="move.judges[2].name === currentUser.name">
+                                      <v-select
+                                        v-model="move.judges[2].status"
+                                        :items="['未完成', '完成']"
+                                        @change="updateJudgeStatus(move.id, 2, move.judges[2].status)"
+                                        class="status-select"
+                                        density="compact"
+                                        hide-details
+                                        variant="outlined"
+                                        :disabled="allScoresConfirmed"
+                                      ></v-select>
+                                    </div>
+                                    <div v-else>
+                                      <v-chip :color="move.judges[2].status === '完成' ? 'success' : 'error'" class="px-2">
+                                        {{ move.judges[2].status }}
+                                      </v-chip>
+                                    </div>
+                                  </td>
+                                  <td class="text-center final-score-display">
+                                    <div v-if="move.finalScore > 0" class="score-number">{{ move.finalScore.toFixed(1) }}</div>
+                                    <div v-else>-</div>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </v-table>
                           </v-card-text>
+                          <v-card-actions class="pa-4">
+                            <v-spacer></v-spacer>
+                            <v-btn
+                              color="primary"
+                              variant="elevated"
+                              @click="confirmAllScores"
+                              :disabled="allScoresConfirmed"
+                              class="px-6"
+                            >
+                              确认评分
+                            </v-btn>
+                          </v-card-actions>
                         </v-card>
                       </v-col>
                     </v-row>
@@ -611,7 +499,7 @@ const matches = ref([
     player1: '张三',
     player2: '李四',
     order: 1,
-    videoFront: '/videos/初级长拳.mp4',
+    videoFront: '/videos/初级长拳.mp',
     videoSide: 'https://v.xinmin.cn/uploads/videos/2024/12/30/BFOL852349.mp4',
     videoBack: 'https://wushu-demo.oss-cn-beijing.aliyuncs.com/%E8%A7%86%E9%A2%91demo_back.mp4'
   }
@@ -751,6 +639,136 @@ const jumpToAction = () => {
   }
 }
 
+// 当前登录用户信息（模拟，实际应从全局状态或API获取）
+const currentUser = ref({
+  name: '张裁判',
+  isConfirmed: false
+})
+
+// 招式裁判评分数据
+const moveJudgeScores = ref([
+  {
+    id: 1,
+    moveName: '准备动作',
+    judges: [
+      { name: '张裁判', status: '未完成', score: 0, isConfirmed: false },
+      { name: '李裁判', status: '未完成', score: 0, isConfirmed: false },
+      { name: '王裁判', status: '未完成', score: 0, isConfirmed: false }
+    ],
+    finalScore: 0
+  },
+  {
+    id: 2,
+    moveName: '腾空摆莲720°',
+    judges: [
+      { name: '张裁判', status: '未完成', score: 0, isConfirmed: false },
+      { name: '李裁判', status: '未完成', score: 0, isConfirmed: false },
+      { name: '王裁判', status: '未完成', score: 0, isConfirmed: false }
+    ],
+    finalScore: 0
+  },
+  {
+    id: 3,
+    moveName: '旋风脚360°',
+    judges: [
+      { name: '张裁判', status: '未完成', score: 0, isConfirmed: false },
+      { name: '李裁判', status: '未完成', score: 0, isConfirmed: false },
+      { name: '王裁判', status: '未完成', score: 0, isConfirmed: false }
+    ],
+    finalScore: 0
+  },
+  {
+    id: 4,
+    moveName: '侧空翻',
+    judges: [
+      { name: '张裁判', status: '未完成', score: 0, isConfirmed: false },
+      { name: '李裁判', status: '未完成', score: 0, isConfirmed: false },
+      { name: '王裁判', status: '未完成', score: 0, isConfirmed: false }
+    ],
+    finalScore: 0
+  },
+  {
+    id: 5,
+    moveName: '后手翻',
+    judges: [
+      { name: '张裁判', status: '未完成', score: 0, isConfirmed: false },
+      { name: '李裁判', status: '未完成', score: 0, isConfirmed: false },
+      { name: '王裁判', status: '未完成', score: 0, isConfirmed: false }
+    ],
+    finalScore: 0
+  },
+  {
+    id: 6,
+    moveName: '鲤鱼打挺',
+    judges: [
+      { name: '张裁判', status: '未完成', score: 0, isConfirmed: false },
+      { name: '李裁判', status: '未完成', score: 0, isConfirmed: false },
+      { name: '王裁判', status: '未完成', score: 0, isConfirmed: false }
+    ],
+    finalScore: 0
+  }
+])
+
+// 更新裁判评分状态
+const updateJudgeStatus = (moveId, judgeIndex, newStatus) => {
+  const move = moveJudgeScores.value.find(m => m.id === moveId)
+  if (move) {
+    move.judges[judgeIndex].status = newStatus
+    // 根据状态计算分数
+    if (newStatus === '完成') {
+      move.judges[judgeIndex].score = 8.5 // 默认完成分数
+    } else {
+      move.judges[judgeIndex].score = 6.0 // 默认未完成分数
+    }
+    // 重新计算最终得分
+    calculateMoveFinalScore(moveId)
+  }
+}
+
+// 计算招式最终得分
+const calculateMoveFinalScore = (moveId) => {
+  const move = moveJudgeScores.value.find(m => m.id === moveId)
+  if (move) {
+    const validScores = move.judges.filter(j => j.status === '完成').map(j => j.score)
+    if (validScores.length > 0) {
+      move.finalScore = validScores.reduce((sum, score) => sum + score, 0) / validScores.length
+    } else {
+      move.finalScore = 0
+    }
+  }
+}
+
+// 确认裁判评分
+const confirmJudgeScore = (moveId, judgeIndex) => {
+  const move = moveJudgeScores.value.find(m => m.id === moveId)
+  if (move) {
+    move.judges[judgeIndex].isConfirmed = true
+    // 可以在这里添加保存到服务器的逻辑
+    console.log(`${move.judges[judgeIndex].name}确认了${move.moveName}的评分: ${move.judges[judgeIndex].status}`)
+    // 显示确认成功的提示
+    alert(`${move.judges[judgeIndex].name}的评分已确认！`)
+  }
+}
+
+// 统一确认所有评分
+const confirmAllScores = () => {
+  // 设置所有裁判评分为已确认状态
+  moveJudgeScores.value.forEach(move => {
+    move.judges.forEach(judge => {
+      judge.isConfirmed = true
+    })
+  })
+  // 显示确认成功的提示
+  alert('所有裁判评分已统一确认！')
+}
+
+// 计算是否所有评分都已确认
+const allScoresConfirmed = computed(() => {
+  return moveJudgeScores.value.every(move => 
+    move.judges.every(judge => judge.isConfirmed)
+  )
+})
+
 // AI分析功能函数
 const openManualScoring = () => {
   // 初始化人工评分值为当前实时评分
@@ -759,6 +777,7 @@ const openManualScoring = () => {
   showManualScoringDialog.value = true
 }
 
+const showAppealDialog = ref(false)
 const openAppealDialog = () => {
   showAppealDialog.value = true
 }
@@ -1353,35 +1372,80 @@ h4 {
 }
 
 /* 评分说明区域 */
-.reason-section {
-  background: #f8f9fa;
-  border-radius: 12px;
-  padding: 20px;
-  margin-top: 16px;
-}
-
-/* 响应式设计 */
-@media (max-width: 600px) {
-  .score-circle {
-    width: 100px;
-    height: 100px;
+  .reason-section {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 16px;
   }
 
-  .score-inner {
-    width: 80px;
-    height: 80px;
+  /* 招式裁判评分表格样式 */
+  .move-judge-scoring-table {
+    overflow: hidden;
+  }
+  
+  .move-scoring-table {
+    width: 100%;
+  }
+  
+  .move-scoring-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: 12px 8px;
+    border-bottom: 2px solid #dee2e6;
+  }
+  
+  .move-scoring-table td {
+    padding: 12px 8px;
+    border-bottom: 1px solid #e9ecef;
+    vertical-align: middle;
+  }
+  
+  .move-scoring-table tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .move-scoring-table tr:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .status-select {
+    max-width: 120px;
+    margin: 0 auto;
+  }
+  
+  .final-score-display {
+    font-weight: 600;
+  }
+  
+  .final-score-display .score-number {
+    font-size: 1.125rem;
+    color: #4caf50;
   }
 
-  .score-number {
-    font-size: 2rem;
-  }
+  /* 响应式设计 */
+  @media (max-width: 600px) {
+    .score-circle {
+      width: 100px;
+      height: 100px;
+    }
 
-  .level-text {
-    font-size: 0.7rem;
-  }
+    .score-inner {
+      width: 80px;
+      height: 80px;
+    }
 
-  .level-range {
-    font-size: 0.6rem;
+    .score-number {
+      font-size: 2rem;
+    }
+
+    .level-text {
+      font-size: 0.7rem;
+    }
+
+    .level-range {
+      font-size: 0.6rem;
+    }
   }
-}
 </style>
