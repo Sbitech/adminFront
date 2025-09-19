@@ -4,7 +4,7 @@
     <!-- 比赛信息展示区域 -->
     <v-row>
       <v-col cols="12">
-        <v-card class="competition-info-card mb-4">
+        <v-card class="competition-info-card">
           <v-card-text>
             <div class="d-flex justify-space-between align-center">
               <!-- 左侧：比赛名称和类型 -->
