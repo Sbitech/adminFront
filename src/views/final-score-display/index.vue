@@ -38,46 +38,48 @@
       </v-col>
     </v-row>
 
-    <!-- 招式评分详情表格 -->
+    <!-- 裁判评分列表 -->
     <v-row>
       <v-col cols="12">
         <v-card>
           <v-card-title>
-            <v-icon left>mdi-sword</v-icon>
-            招式评分详情
+            <v-icon left>mdi-account-judge</v-icon>
+            裁判评分列表
           </v-card-title>
           <v-card-text>
-            <v-table class="movement-score-table">
+            <v-table class="judge-score-table">
               <thead>
                 <tr>
-                  <th class="text-left">招式名称</th>
-                  <th class="text-right">基础分</th>
+                  <th class="text-left">裁判姓名</th>
+                  <th class="text-center">裁判角色</th>
                   <th class="text-right">难度分</th>
                   <th class="text-right">完成分</th>
-                  <th class="text-right">扣分</th>
-                  <th class="text-right">得分</th>
+                  <th class="text-right">综合评分</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(movement, index) in movements" :key="index">
-                  <td>{{ movement.name }}</td>
-                  <td class="text-right">{{ movement.baseScore.toFixed(2) }}</td>
-                  <td class="text-right">{{ movement.difficultyScore.toFixed(2) }}</td>
-                  <td class="text-right">{{ movement.completionScore.toFixed(2) }}</td>
-                  <td class="text-right text-red">{{ movement.deduction.toFixed(2) }}</td>
-                  <td class="text-right font-weight-bold">{{ calculateFinalScore(movement).toFixed(2) }}</td>
+                <tr v-for="(judge, index) in judgeScores" :key="index">
+                  <td>
+                    <div class="judge-info">
+                      {{ judge.name }}
+                    </div>
+                  </td>
+                  <td class="text-center">
+                    <v-chip :color="getRoleColor(judge.role)" size="small" variant="flat">
+                      {{ judge.role }}
+                    </v-chip>
+                  </td>
+                  <td class="text-right">{{ judge.difficultyScore.toFixed(1) }}</td>
+                  <td class="text-right">{{ judge.completionScore.toFixed(1) }}</td>
+                  <td class="text-right font-weight-bold">{{ judge.totalScore.toFixed(1) }}</td>
                 </tr>
-                <!-- 汇总行 -->
-                <tr class="summary-row">
-                  <td><strong>总计</strong></td>
-                  <td class="text-right"><strong>{{ totalBaseScore.toFixed(2) }}</strong></td>
-                  <td class="text-right"><strong>{{ totalDifficultyScore.toFixed(2) }}</strong></td>
-                  <td class="text-right"><strong>{{ totalCompletionScore.toFixed(2) }}</strong></td>
-                  <td class="text-right text-red"><strong>{{ totalDeduction.toFixed(2) }}</strong></td>
-                  <td class="text-right"><strong>{{ subtotalScore.toFixed(2) }}</strong></td>
+                <!-- 平均分汇总行 -->
+                <tr class="average-row">
+                  <td colspan="2"><strong>平均分</strong></td>
+                  <td class="text-right"><strong>{{ averageDifficultyScore.toFixed(1) }}</strong></td>
+                  <td class="text-right"><strong>{{ averageCompletionScore.toFixed(1) }}</strong></td>
+                  <td class="text-right"><strong>{{ averageTotalScore.toFixed(1) }}</strong></td>
                 </tr>
-
-               
               </tbody>
             </v-table>
           </v-card-text>
@@ -108,10 +110,10 @@ const currentPlayer = ref({
 
 // 最终评分数据
 const finalTotalScore = computed(() => {
-  return movements.value.reduce((sum, movement) => sum + calculateFinalScore(movement), 0)
+  return averageTotalScore.value
 })
 const finalPenaltyScore = computed(() => {
-  return movements.value.reduce((sum, movement) => sum + movement.deduction, 0)
+  return 0 // 裁判评分模式下不显示扣分
 })
 
 // 全屏状态管理
@@ -141,42 +143,91 @@ onUnmounted(() => {
   window.removeEventListener('fullscreenChanged', handleFullscreenChange)
 })
 
-// 招式评分数据
-const movements = ref([
-  { name: '起势', baseScore: 9.20, difficultyScore: 2.0, completionScore: 9.20, deduction: 0.20 },
-  { name: '野马分鬃', baseScore: 9.50, difficultyScore: 2.5, completionScore: 9.50, deduction: 0.15 },
-  { name: '白鹤亮翅', baseScore: 9.30, difficultyScore: 2.3, completionScore: 9.30, deduction: 0.10 },
-  { name: '搂膝拗步', baseScore: 9.40, difficultyScore: 2.4, completionScore: 9.40, deduction: 0.25 },
-  { name: '手挥琵琶', baseScore: 9.10, difficultyScore: 2.2, completionScore: 9.10, deduction: 0.30 },
-  { name: '倒卷肱', baseScore: 9.60, difficultyScore: 2.6, completionScore: 9.60, deduction: 0.20 },
-  { name: '左揽雀尾', baseScore: 9.70, difficultyScore: 2.7, completionScore: 9.70, deduction: 0.15 },
-  { name: '右揽雀尾', baseScore: 9.50, difficultyScore: 2.5, completionScore: 9.50, deduction: 0.10 }
+// 裁判评分数据
+const judgeScores = ref([
+  {
+    name: '张裁判',
+    role: '主裁判',
+    difficultyScore: 8.5,
+    completionScore: 9.0,
+    totalScore: 17.5,
+    status: '已评分'
+  },
+  {
+    name: '李裁判',
+    role: '副裁判',
+    difficultyScore: 8.2,
+    completionScore: 8.8,
+    totalScore: 17.0,
+    status: '已评分'
+  },
+  {
+    name: '王裁判',
+    role: '副裁判',
+    difficultyScore: 8.7,
+    completionScore: 9.1,
+    totalScore: 17.8,
+    status: '已评分'
+  },
+  {
+    name: '赵裁判',
+    role: '副裁判',
+    difficultyScore: 8.3,
+    completionScore: 8.9,
+    totalScore: 17.2,
+    status: '已评分'
+  },
+  {
+    name: '陈裁判',
+    role: '副裁判',
+    difficultyScore: 8.6,
+    completionScore: 8.7,
+    totalScore: 17.3,
+    status: '已评分'
+  }
 ])
 
-// 计算属性 - 单个招式最终得分（基础分 + 难度分 + 完成分 - 扣分）
-const calculateFinalScore = (movement) => {
-  return movement.baseScore + movement.difficultyScore + movement.completionScore - movement.deduction
+// 获取角色颜色
+const getRoleColor = (role) => {
+  const colorMap = {
+    '主裁判': 'error',
+    '副裁判': 'warning',
+    '技术裁判': 'info',
+    '助理裁判': 'success'
+  }
+  return colorMap[role] || 'default'
 }
 
-// 计算属性 - 汇总数据
-const totalBaseScore = computed(() => {
-  return movements.value.reduce((sum, movement) => sum + movement.baseScore, 0)
+// 获取状态颜色
+const getStatusColor = (status) => {
+  const colorMap = {
+    '已评分': 'success',
+    '评分中': 'warning',
+    '未评分': 'default'
+  }
+  return colorMap[status] || 'default'
+}
+
+// 计算属性 - 裁判评分汇总数据
+const averageDifficultyScore = computed(() => {
+  const validScores = judgeScores.value.filter(judge => judge.status === '已评分')
+  if (validScores.length === 0) return 0
+  const sum = validScores.reduce((sum, judge) => sum + judge.difficultyScore, 0)
+  return sum / validScores.length
 })
 
-const totalDifficultyScore = computed(() => {
-  return movements.value.reduce((sum, movement) => sum + movement.difficultyScore, 0)
+const averageCompletionScore = computed(() => {
+  const validScores = judgeScores.value.filter(judge => judge.status === '已评分')
+  if (validScores.length === 0) return 0
+  const sum = validScores.reduce((sum, judge) => sum + judge.completionScore, 0)
+  return sum / validScores.length
 })
 
-const totalCompletionScore = computed(() => {
-  return movements.value.reduce((sum, movement) => sum + movement.completionScore, 0)
-})
-
-const totalDeduction = computed(() => {
-  return movements.value.reduce((sum, movement) => sum + movement.deduction, 0)
-})
-
-const subtotalScore = computed(() => {
-  return movements.value.reduce((sum, movement) => sum + calculateFinalScore(movement), 0)
+const averageTotalScore = computed(() => {
+  const validScores = judgeScores.value.filter(judge => judge.status === '已评分')
+  if (validScores.length === 0) return 0
+  const sum = validScores.reduce((sum, judge) => sum + judge.totalScore, 0)
+  return sum / validScores.length
 })
 </script>
 
@@ -360,6 +411,44 @@ const subtotalScore = computed(() => {
 .final-score-page {
   transition: padding 0.3s ease;
 }
+
+/* 裁判评分表格样式 */
+  .judge-score-table {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .judge-score-table th {
+    background-color: #f5f5f5;
+    font-weight: 600;
+    color: #333;
+    border-bottom: 2px solid #e0e0e0;
+  }
+  
+  .judge-score-table td {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 12px 16px;
+  }
+  
+  .judge-score-table tbody tr:hover {
+    background-color: #fafafa;
+  }
+  
+  .judge-info {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+  }
+  
+  .average-row {
+    background-color: #e3f2fd;
+    font-weight: bold;
+  }
+  
+  .average-row td {
+    border-top: 2px solid #1976d2;
+  }
 
 /* 全屏时的额外样式 */
 :deep(.v-main) {

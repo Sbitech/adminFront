@@ -9,7 +9,8 @@
       width="240"
       class="judge-sidebar"
       elevation="2"
-      :style="{ display: isFullscreen ? 'none' : 'block' }"
+      :style="{ display: isFullscreen ? 'none' : 'flex' }"
+      style="flex-direction: column; height: 100vh;"
     >
       <v-list-item
         prepend-avatar="https://randomuser.me/api/portraits/men/85.jpg"
@@ -22,128 +23,130 @@
     
       <v-divider></v-divider>
 
-      <v-list density="compact" nav>
-        <v-list-item 
-          prepend-icon="mdi-home"   
-          title="主页" 
-          value="home" 
-          to="/home"
-          exact
-        ></v-list-item>
-        <v-list-group value="replay-management" fluid>
-          <template v-slot:activator="{ props }">
+      <div class="sidebar-content">
+        <v-list density="compact" nav class="sidebar-main-menu">
+          <v-list-item 
+            prepend-icon="mdi-home"   
+            title="主页" 
+            value="home" 
+            to="/home"
+            exact
+          ></v-list-item>
+          <v-list-group value="replay-management" fluid>
+            <template v-slot:activator="{ props }">
+              <v-list-item
+                prepend-icon="mdi-play-box-multiple"
+                title="回放处理"
+                v-bind="props"
+              ></v-list-item>
+            </template>
+            
             <v-list-item
-              prepend-icon="mdi-play-box-multiple"
-              title="回放处理"
-              v-bind="props"
+              prepend-icon="mdi-play"
+              title="实时回放"
+              value="replay"
+              to="/replay"
+              exact
+              style="padding-left: 32px !important;"
             ></v-list-item>
-          </template>
-          
-          <v-list-item
-            prepend-icon="mdi-play"
-            title="实时回放"
-            value="replay"
-            to="/replay"
-            exact
-            style="padding-left: 32px !important;"
-          ></v-list-item>
-          <v-list-item
-            prepend-icon="mdi-video-plus"
-            title="新增赛事"
-            value="new-match"
-            to="/new-match"
-            exact
-            style="padding-left: 32px !important;"
-          ></v-list-item>
-        </v-list-group>
-        <v-list-item 
-          prepend-icon="mdi-database" 
-          title="数据备份" 
-          value="backup" 
-          to="/backup"
-          exact
-        ></v-list-item>
-        <v-list-item 
-          prepend-icon="mdi-file-pdf-box" 
-          title="报告PDF" 
-          value="report" 
-          to="/report"
-          exact
-        ></v-list-item>
-        <v-list-item 
-          prepend-icon="mdi-history" 
-          title="数据回溯" 
-          value="history" 
-          to="/history"
-          exact
-        ></v-list-item>
-        <v-list-item 
-          prepend-icon="mdi-alert-circle" 
-          title="争议复核" 
-          value="dispute" 
-          to="/dispute"
-          exact
-        ></v-list-item>
-        <v-list-item 
-          prepend-icon="mdi-bell" 
-          title="消息通知" 
-          value="notification" 
-          to="/notification"
-          exact
-        ></v-list-item>
-
-        <v-list-item 
-          prepend-icon="mdi-medal" 
-          title="最终评分" 
-          value="final-score-display" 
-          to="/final-score-display"
-          exact
-        ></v-list-item>
-        <v-list-group value="permission" fluid>
-          <template v-slot:activator="{ props }">
             <v-list-item
-              prepend-icon="mdi-shield-account"
-              title="权限与规则"
-              v-bind="props"
+              prepend-icon="mdi-video-plus"
+              title="新增赛事"
+              value="new-match"
+              to="/new-match"
+              exact
+              style="padding-left: 32px !important;"
             ></v-list-item>
-          </template>
-          
-          <v-list-item
-            prepend-icon="mdi-account-key"
-            title="权限配置"
-            value="permission-config"
-            to="/permission"
+          </v-list-group>
+          <v-list-item 
+            prepend-icon="mdi-database" 
+            title="数据备份" 
+            value="backup" 
+            to="/backup"
             exact
-            style="padding-left: 32px !important;"
           ></v-list-item>
-          <v-list-item
-            prepend-icon="mdi-tune-variant"
-            title="评分规则"
-            value="scoring-rules"
-            to="/scoring-rules"
+          <v-list-item 
+            prepend-icon="mdi-file-pdf-box" 
+            title="报告PDF" 
+            value="report" 
+            to="/report"
             exact
-            style="padding-left: 32px !important;"
           ></v-list-item>
-          <v-list-item
-            prepend-icon="mdi-book-open-variant"
-            title="规则库"
-            value="rule-library"
-            to="/rule-library"
+          <v-list-item 
+            prepend-icon="mdi-history" 
+            title="数据回溯" 
+            value="history" 
+            to="/history"
             exact
-            style="padding-left: 32px !important;"
           ></v-list-item>
-        </v-list-group>
-      </v-list>
+          <v-list-item 
+            prepend-icon="mdi-alert-circle" 
+            title="争议复核" 
+            value="dispute" 
+            to="/dispute"
+            exact
+          ></v-list-item>
+          <v-list-item 
+            prepend-icon="mdi-bell" 
+            title="消息通知" 
+            value="notification" 
+            to="/notification"
+            exact
+          ></v-list-item>
 
-      <template v-slot:append>
-        <v-list density="compact" nav>
+          <v-list-item 
+            prepend-icon="mdi-medal" 
+            title="大屏评分" 
+            value="final-score-display" 
+            to="/final-score-display"
+            exact
+          ></v-list-item>
+          <v-list-group value="permission" fluid>
+            <template v-slot:activator="{ props }">
+              <v-list-item
+                prepend-icon="mdi-shield-account"
+                title="权限与规则"
+                v-bind="props"
+              ></v-list-item>
+            </template>
+            
+            <v-list-item
+              prepend-icon="mdi-account-key"
+              title="权限配置"
+              value="permission-config"
+              to="/permission"
+              exact
+              style="padding-left: 32px !important;"
+            ></v-list-item>
+            <v-list-item
+              prepend-icon="mdi-tune-variant"
+              title="评分规则"
+              value="scoring-rules"
+              to="/scoring-rules"
+              exact
+              style="padding-left: 32px !important;"
+            ></v-list-item>
+            <v-list-item
+              prepend-icon="mdi-book-open-variant"
+              title="规则库"
+              value="rule-library"
+              to="/rule-library"
+              exact
+              style="padding-left: 32px !important;"
+            ></v-list-item>
+          </v-list-group>
+        </v-list>
+        
+        <div class="sidebar-footer">
+          <v-divider></v-divider>
           <v-list-item 
             prepend-icon="mdi-logout" 
             title="退出登录" 
             @click="logout"
+            class="logout-item"
           ></v-list-item>
-        </v-list>
-      </template>
+        </div>
+      </div>
     </v-navigation-drawer>
 
     <!-- 顶部工具栏 -->
@@ -426,6 +429,8 @@ const logout = () => {
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
   border-right: 1px solid #e0e0e0;
   z-index: 1000;
+  height: 100vh !important;
+  overflow: hidden !important; /* 完全隐藏滚动条 */
 }
 
 .judge-main {
@@ -508,6 +513,48 @@ const logout = () => {
   width: 40px !important;
   height: 40px !important;
   flex: 0 0 40px !important;
+}
+
+/* 侧边栏布局样式 */
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 64px); /* 减去头像区域的高度 */
+  overflow: hidden !important; /* 完全隐藏滚动条 */
+}
+
+.sidebar-main-menu {
+  flex: 1;
+  overflow: hidden !important; /* 完全隐藏滚动条 */
+  padding-bottom: 8px; /* 添加一些底部间距 */
+}
+
+.sidebar-footer {
+  flex-shrink: 0;
+  background: white;
+  border-top: 1px solid #e0e0e0;
+  margin-top: auto; /* 确保在底部 */
+}
+
+.logout-item {
+  background: white;
+  font-size: 14px !important; /* 统一字体大小 */
+  font-weight: 500 !important;
+}
+
+.logout-item:hover {
+  background-color: rgba(239, 83, 80, 0.08) !important;
+  color: #ef5353 !important;
+}
+
+/* 统一所有菜单项的字体大小 */
+:deep(.v-list-item-title) {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
+
+:deep(.v-list-item--nav) {
+  font-size: 14px !important;
 }
 
 /* 响应式布局优化 */
